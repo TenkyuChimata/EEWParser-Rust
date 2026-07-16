@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://xml.kishou.go.jp/jmaxml1/" xmlns:jmx="http://xml.kishou.go.jp/jmaxml1/">
+  <Control><Title>緊急地震速報（地震動予報）</Title><DateTime>2024-01-01T07:11:46Z</DateTime><Status>通常</Status><EditorialOffice>気象庁本庁</EditorialOffice><PublishingOffice>気象庁</PublishingOffice></Control>
+  <Head xmlns="http://xml.kishou.go.jp/jmaxml1/informationBasis1/"><Title>緊急地震速報（地震動予報）</Title><ReportDateTime>2024-01-01T16:11:46+09:00</ReportDateTime><TargetDateTime>2024-01-01T16:11:46+09:00</TargetDateTime><EventID>20240101161133</EventID><InfoType>取消</InfoType><Serial>4</Serial><InfoKind>緊急地震速報</InfoKind><InfoKindVersion>1.2_0</InfoKindVersion><Headline><Text/></Headline></Head>
+  <Body xmlns="http://xml.kishou.go.jp/jmaxml1/body/seismology1/" xmlns:jmx_eb="http://xml.kishou.go.jp/jmaxml1/elementBasis1/"><Text>先ほどの、緊急地震速報（地震動予報）を取り消します。</Text></Body>
+</Report>

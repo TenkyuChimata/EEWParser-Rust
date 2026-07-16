@@ -3,7 +3,13 @@ name = "EEWParser-Rust"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "eew_parser"
+path = "src/lib.rs"
+
 [dependencies]
-regex = "1"
+chrono = { version = "0.4", default-features = false, features = ["std"] }
+roxmltree = "0.20"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+thiserror = "2"

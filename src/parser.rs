@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+use crate::error::AppError;
+
 // Telegram main struct
 #[allow(non_snake_case)]
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct Telegram {
     pub CodeType: String,
     pub Section: String,
@@ -31,11 +33,12 @@ pub struct Telegram {
     pub Rc1: String,
     pub Rc2: String,
     pub Ebis: Vec<Ebi>,
+    pub Telegram: String,
 }
 
 // Ebi in Telegram 予想震度と到達時
 #[allow(non_snake_case)]
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct Ebi {
     pub Chiiki: String,
     pub Shindo1: String,
@@ -45,51 +48,38 @@ pub struct Ebi {
     pub Arrive: String,
 }
 
-fn slice_str(vec: &[u8], start: usize, end: usize) -> String {
-    if start >= end || end > vec.len() {
-        String::new()
-    } else {
-        String::from_utf8_lossy(&vec[start..end]).to_string()
-    }
-}
-
 // ========== Public API ==========
 
-pub fn decoder(s: &str) -> Telegram {
-    let from = reader(s);
-    let mut to = Telegram::default();
-
-    // 基本字段映射
-    to.CodeType = code_type(&from.CodeType).to_string();
-    to.Section = section(&from.Section).to_string();
-    to.MsgType = msg_type(&from.MsgType).to_string();
-    to.WarnType = warn_type(&from.WarnType).to_string();
-    to.WarnCode = warn_code(&from.WarnCode).to_string();
-
-    to.Rk1 = rk1(&from.Rk1).to_string();
-    to.Rk2 = rk2(&from.Rk2).to_string();
-    to.Rk3 = rk3(&from.Rk3).to_string();
-
-    to.Rt1 = rt1(&from.Rt1).to_string();
-    to.Rt2 = rt2(&from.Rt2).to_string();
-    to.Rt3 = rt3(&from.Rt3).to_string();
-
-    to.Rc1 = rc1(&from.Rc1).to_string();
-    to.Rc2 = rc2(&from.Rc2).to_string();
-
-    to.WarnTime = format!("20{}", from.WarnTime);
-    to.CommandCode = from.CommandCode.clone();
-    to.EqTime = format!("20{}", from.EqTime);
-    to.WarnNum = from.WarnNum.clone();
-    to.EqID = from.EqID.clone();
-
-    to.Shinou = shinou_code(&from.Shinou).to_string();
-    to.Shindo = shindo(&from.Shindo).to_string();
-
-    to.ShinouLat = from.ShinouLat;
-    to.ShinouLng = from.ShinouLng;
-    to.ShinouDpth = from.ShinouDpth;
-    to.Magnitude = from.Magnitude;
+pub fn decoder(s: &str, logical_telegram: String) -> Result<Telegram, AppError> {
+    let from = reader(s)?;
+    let mut to = Telegram {
+        CodeType: code_type(&from.CodeType).to_string(),
+        Section: section(&from.Section).to_string(),
+        MsgType: msg_type(&from.MsgType).to_string(),
+        WarnTime: format!("20{}", from.WarnTime),
+        CommandCode: from.CommandCode.clone(),
+        EqTime: format!("20{}", from.EqTime),
+        EqID: from.EqID.clone(),
+        WarnType: warn_type(&from.WarnType).to_string(),
+        WarnCode: warn_code(&from.WarnCode).to_string(),
+        WarnNum: from.WarnNum.clone(),
+        Shinou: shinou_code(&from.Shinou).to_string(),
+        ShinouLat: from.ShinouLat,
+        ShinouLng: from.ShinouLng,
+        ShinouDpth: from.ShinouDpth,
+        Magnitude: from.Magnitude,
+        Shindo: shindo(&from.Shindo).to_string(),
+        Rk1: rk1(&from.Rk1).to_string(),
+        Rk2: rk2(&from.Rk2).to_string(),
+        Rk3: rk3(&from.Rk3).to_string(),
+        Rt1: rt1(&from.Rt1).to_string(),
+        Rt2: rt2(&from.Rt2).to_string(),
+        Rt3: rt3(&from.Rt3).to_string(),
+        Rc1: rc1(&from.Rc1).to_string(),
+        Rc2: rc2(&from.Rc2).to_string(),
+        Telegram: logical_telegram,
+        ..Telegram::default()
+    };
 
     for e in &from.Ebis {
         to.Ebis.push(Ebi {
@@ -102,119 +92,342 @@ pub fn decoder(s: &str) -> Telegram {
         });
     }
 
-    to
+    Ok(to)
 }
 
-pub fn reader(s: &str) -> Telegram {
-    let mut msg = Telegram::default();
+impl Telegram {
+    /// The raw JMA event identifier carried by ND.
+    pub fn event_id(&self) -> &str {
+        &self.EqID
+    }
 
-    for line in s.split('\n') {
-        let line = line;
-        let length = line.len();
-        let vec = line.as_bytes();
+    /// The raw NCN/NCPN serial token. An empty token means the Telegram type
+    /// does not carry an event serial.
+    pub fn serial_token(&self) -> Option<&str> {
+        (!self.WarnNum.is_empty()).then_some(self.WarnNum.as_str())
+    }
 
-        if length == 0 {
-            continue;
-        } else if length == 25 {
-            // 1 :
-            msg.CodeType = slice_str(vec, 0, 2);
-            msg.Section = slice_str(vec, 3, 5);
-            msg.MsgType = slice_str(vec, 6, 8);
-            msg.WarnTime = slice_str(vec, 9, 21);
-            msg.CommandCode = slice_str(vec, 23, 25); // "11"
-        } else if length == 12 {
-            // 2 :
-            msg.EqTime = line.to_string();
-        } else if length == 46 {
-            // 3 :
-            msg.EqID = slice_str(vec, 2, 16);
-            msg.WarnType = slice_str(vec, 17, 20);
-            msg.WarnCode = slice_str(vec, 20, 21);
-            msg.WarnNum = slice_str(vec, 21, 23);
-        } else if length == 48 {
-            // 4 :
-            msg.Shinou = slice_str(vec, 0, 3);
-
-            let lat: f64 = slice_str(vec, 5, 8).parse().unwrap_or(0.0);
-            msg.ShinouLat = lat / 10.0;
-
-            let lng: f64 = slice_str(vec, 10, 14).parse().unwrap_or(0.0);
-            msg.ShinouLng = lng / 10.0;
-
-            let dpth: i64 = slice_str(vec, 15, 18).parse().unwrap_or(0);
-            msg.ShinouDpth = dpth;
-
-            let mag: f64 = slice_str(vec, 19, 21).parse().unwrap_or(0.0);
-            msg.Magnitude = mag / 10.0;
-
-            msg.Shindo = slice_str(vec, 22, 24);
-
-            msg.Rk1 = slice_str(vec, 27, 28);
-            msg.Rk2 = slice_str(vec, 28, 29);
-            msg.Rk3 = slice_str(vec, 29, 30);
-            msg.Rk4 = slice_str(vec, 30, 31);
-            msg.Rk5 = slice_str(vec, 31, 32);
-
-            msg.Rt1 = slice_str(vec, 35, 36);
-            msg.Rt2 = slice_str(vec, 36, 37);
-            msg.Rt3 = slice_str(vec, 37, 38);
-
-            msg.Rc1 = slice_str(vec, 43, 44);
-            msg.Rc2 = slice_str(vec, 44, 45);
-        } else if length == 63 {
-            // 5 :
-            let mut offset = 4;
-            msg.Ebis.push(read_ebi(vec, offset));
-            offset += 20;
-            msg.Ebis.push(read_ebi(vec, offset));
-            offset += 20;
-            msg.Ebis.push(read_ebi(vec, offset));
-        } else if length == 59 {
-            // 6 :
-            let mut offset = 0;
-            msg.Ebis.push(read_ebi(vec, offset));
-            offset += 20;
-            msg.Ebis.push(read_ebi(vec, offset));
-            offset += 20;
-            msg.Ebis.push(read_ebi(vec, offset));
-        } else if length == 43 {
-            //
-            let mut offset = 4;
-            msg.Ebis.push(read_ebi(vec, offset));
-            offset += 20;
-            msg.Ebis.push(read_ebi(vec, offset));
-        } else if length == 39 {
-            //10 :
-            let mut offset = 0;
-            msg.Ebis.push(read_ebi(vec, offset));
-            offset += 20;
-            msg.Ebis.push(read_ebi(vec, offset));
-        } else if length == 23 {
-            //
-            let offset = 4;
-            msg.Ebis.push(read_ebi(vec, offset));
-        } else if length == 19 {
-            //11 : :contentReference[oaicite:10]{index=10}
-            let offset = 0;
-            msg.Ebis.push(read_ebi(vec, offset));
-        } else if length == 5 {
-            //13 :
-            return msg;
+    /// Converts the official 01..99/A0..Z9 serial representation without
+    /// interpreting localized display strings or inventing a fallback value.
+    pub fn serial(&self) -> Option<u32> {
+        let token = self.serial_token()?;
+        if token.len() != 2 || !token.is_ascii() {
+            return None;
         }
+        if token.bytes().all(|byte| byte.is_ascii_digit()) {
+            return token.parse().ok();
+        }
+        let bytes = token.as_bytes();
+        if bytes[0].is_ascii_uppercase() && bytes[1].is_ascii_digit() {
+            return Some(100 + u32::from(bytes[0] - b'A') * 10 + u32::from(bytes[1] - b'0'));
+        }
+        None
     }
 
-    msg
+    pub fn is_final(&self) -> bool {
+        self.WarnCode == "最終"
+    }
 }
 
-fn read_ebi(vec: &[u8], offset: usize) -> Ebi {
-    Ebi {
-        Chiiki: slice_str(vec, offset + 0, offset + 3),
-        Shindo1: slice_str(vec, offset + 5, offset + 7),
-        Shindo2: slice_str(vec, offset + 7, offset + 9),
-        Time: slice_str(vec, offset + 10, offset + 16),
-        Type: slice_str(vec, offset + 17, offset + 18),
-        Arrive: slice_str(vec, offset + 18, offset + 19),
+pub fn reader(s: &str) -> Result<Telegram, AppError> {
+    let tokens: Vec<&str> = s.split_whitespace().collect();
+    if tokens.len() < 6 {
+        return Err(invalid("Telegram is too short"));
     }
+
+    let mut msg = Telegram::default();
+    let mut index = 0;
+
+    msg.CodeType = take(&tokens, &mut index, "code type")?.to_string();
+    if !matches!(
+        msg.CodeType.as_str(),
+        "35" | "36" | "37" | "38" | "39" | "47" | "48" | "61"
+    ) {
+        return Err(invalid(format!("unsupported code type {:?}", msg.CodeType)));
+    }
+    msg.Section = fixed(take(&tokens, &mut index, "section")?, 2, "section")?.to_string();
+    msg.MsgType = fixed(
+        take(&tokens, &mut index, "message type")?,
+        2,
+        "message type",
+    )?
+    .to_string();
+    msg.WarnTime = fixed(
+        take(&tokens, &mut index, "warning time")?,
+        12,
+        "warning time",
+    )?
+    .to_string();
+    let command = fixed(
+        take(&tokens, &mut index, "command code")?,
+        3,
+        "command code",
+    )?;
+    msg.CommandCode = command
+        .strip_prefix('C')
+        .ok_or_else(|| invalid("command code must start with C"))?
+        .to_string();
+
+    match msg.CodeType.as_str() {
+        "35" | "36" | "37" | "39" | "61" => {
+            parse_forecast(&tokens, &mut index, &mut msg)?;
+        }
+        "47" => parse_warning(&tokens, &mut index, &mut msg, true)?,
+        "48" => parse_warning(&tokens, &mut index, &mut msg, false)?,
+        "38" => {}
+        _ => unreachable!(),
+    }
+
+    if take(&tokens, &mut index, "Telegram terminator")? != "9999=" {
+        return Err(invalid("expected 9999= terminator"));
+    }
+    if index != tokens.len() {
+        return Err(invalid("unexpected data after 9999="));
+    }
+
+    Ok(msg)
+}
+
+fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Result<(), AppError> {
+    msg.EqTime = fixed(
+        take(tokens, index, "earthquake time")?,
+        12,
+        "earthquake time",
+    )?
+    .to_string();
+    let nd = prefixed(take(tokens, index, "ND")?, "ND", 14)?;
+    msg.EqID = nd.to_string();
+
+    let ncn = prefixed(take(tokens, index, "NCN")?, "NCN", 3)?;
+    msg.WarnType = "NCN".to_string();
+    msg.WarnCode = ncn[0..1].to_string();
+    msg.WarnNum = ncn[1..3].to_string();
+
+    prefixed(take(tokens, index, "JD")?, "JD", 14)?;
+    prefixed(take(tokens, index, "JN")?, "JN", 3)?;
+
+    msg.Shinou = fixed(take(tokens, index, "epicenter code")?, 3, "epicenter code")?.to_string();
+    msg.ShinouLat = parse_coordinate(take(tokens, index, "latitude")?, 'N', 'S', 3)?;
+    msg.ShinouLng = parse_coordinate(take(tokens, index, "longitude")?, 'E', 'W', 4)?;
+    msg.ShinouDpth = parse_unknown_i64(take(tokens, index, "depth")?, 3, "depth")?;
+    msg.Magnitude = parse_unknown_decimal(take(tokens, index, "magnitude")?, 2, "magnitude")?;
+    msg.Shindo = fixed(
+        take(tokens, index, "maximum intensity")?,
+        2,
+        "maximum intensity",
+    )?
+    .to_string();
+
+    let rk = prefixed(take(tokens, index, "RK")?, "RK", 5)?;
+    msg.Rk1 = rk[0..1].to_string();
+    msg.Rk2 = rk[1..2].to_string();
+    msg.Rk3 = rk[2..3].to_string();
+    msg.Rk4 = rk[3..4].to_string();
+    msg.Rk5 = rk[4..5].to_string();
+
+    let rt = prefixed(take(tokens, index, "RT")?, "RT", 5)?;
+    msg.Rt1 = rt[0..1].to_string();
+    msg.Rt2 = rt[1..2].to_string();
+    msg.Rt3 = rt[2..3].to_string();
+
+    let rc = prefixed(take(tokens, index, "RC")?, "RC", 5)?;
+    msg.Rc1 = rc[0..1].to_string();
+    msg.Rc2 = rc[1..2].to_string();
+
+    match tokens.get(*index).copied() {
+        Some("EBI") => {
+            *index += 1;
+            while tokens.get(*index).copied() != Some("9999=") {
+                msg.Ebis.push(parse_ebi(tokens, index)?);
+            }
+        }
+        Some("EIP") => {
+            *index += 1;
+            while tokens.get(*index).copied() != Some("9999=") {
+                fixed(
+                    take(tokens, index, "EIP station code")?,
+                    7,
+                    "EIP station code",
+                )?;
+                let value = take(tokens, index, "EIP intensity")?;
+                if value.len() != 3 || !value.starts_with('P') {
+                    return Err(invalid("invalid EIP intensity"));
+                }
+            }
+        }
+        _ => {}
+    }
+
+    Ok(())
+}
+
+fn parse_warning(
+    tokens: &[&str],
+    index: &mut usize,
+    msg: &mut Telegram,
+    has_forecast: bool,
+) -> Result<(), AppError> {
+    msg.EqTime = fixed(
+        take(tokens, index, "earthquake time")?,
+        12,
+        "earthquake time",
+    )?
+    .to_string();
+    msg.EqID = prefixed(take(tokens, index, "ND")?, "ND", 14)?.to_string();
+    let ncpn = prefixed(take(tokens, index, "NCPN")?, "NCPN", 2)?;
+    let warning_number = ncpn.to_string();
+    msg.WarnType = "NCPN".to_string();
+    msg.WarnNum.clone_from(&warning_number);
+
+    fixed(
+        take(tokens, index, "reduced epicenter code")?,
+        4,
+        "reduced epicenter code",
+    )?;
+    msg.ShinouLat = parse_coordinate(take(tokens, index, "latitude")?, 'N', 'S', 3)?;
+    msg.ShinouLng = parse_coordinate(take(tokens, index, "longitude")?, 'E', 'W', 4)?;
+    msg.ShinouDpth = parse_unknown_i64(take(tokens, index, "depth")?, 3, "depth")?;
+    prefixed(take(tokens, index, "PRC")?, "PRC", 5)?;
+
+    for (marker, next) in [
+        ("CAI", "CPI"),
+        ("CPI", "CBI"),
+        ("CBI", "PAI"),
+        ("PAI", "PPI"),
+        ("PPI", "PBI"),
+    ] {
+        consume_list(tokens, index, marker, next)?;
+    }
+    consume_list(
+        tokens,
+        index,
+        "PBI",
+        if has_forecast { "NCP" } else { "9999=" },
+    )?;
+
+    if has_forecast {
+        if take(tokens, index, "NCP")? != "NCP" {
+            return Err(invalid("expected NCP before forecast block"));
+        }
+        parse_forecast(tokens, index, msg)?;
+        // Nested NCP fields populate the forecast detail, but the JSON report
+        // identity remains the top-level general warning and its NCPN serial.
+        msg.WarnType = "NCPN".to_string();
+        msg.WarnNum = warning_number;
+    }
+
+    Ok(())
+}
+
+fn consume_list(
+    tokens: &[&str],
+    index: &mut usize,
+    marker: &str,
+    next: &str,
+) -> Result<(), AppError> {
+    if take(tokens, index, marker)? != marker {
+        return Err(invalid(format!("expected {marker}")));
+    }
+    let start = *index;
+    while tokens.get(*index).copied() != Some(next) {
+        if *index >= tokens.len() {
+            return Err(invalid(format!("unterminated {marker} list")));
+        }
+        *index += 1;
+    }
+    if *index == start {
+        return Err(invalid(format!("empty {marker} list")));
+    }
+    Ok(())
+}
+
+fn parse_ebi(tokens: &[&str], index: &mut usize) -> Result<Ebi, AppError> {
+    let area = fixed(take(tokens, index, "EBI area")?, 3, "EBI area")?;
+    let intensity = fixed(take(tokens, index, "EBI intensity")?, 5, "EBI intensity")?;
+    let intensity = intensity
+        .strip_prefix('S')
+        .ok_or_else(|| invalid("EBI intensity must start with S"))?;
+    let time = fixed(take(tokens, index, "EBI time")?, 6, "EBI time")?;
+    let flags = fixed(take(tokens, index, "EBI flags")?, 2, "EBI flags")?;
+    Ok(Ebi {
+        Chiiki: area.to_string(),
+        Shindo1: intensity[0..2].to_string(),
+        Shindo2: intensity[2..4].to_string(),
+        Time: time.to_string(),
+        Type: flags[0..1].to_string(),
+        Arrive: flags[1..2].to_string(),
+    })
+}
+
+fn take<'a>(tokens: &[&'a str], index: &mut usize, field: &str) -> Result<&'a str, AppError> {
+    let token = tokens
+        .get(*index)
+        .copied()
+        .ok_or_else(|| invalid(format!("missing {field}")))?;
+    *index += 1;
+    Ok(token)
+}
+
+fn fixed<'a>(token: &'a str, length: usize, field: &str) -> Result<&'a str, AppError> {
+    if token.is_ascii() && token.len() == length {
+        Ok(token)
+    } else {
+        Err(invalid(format!(
+            "{field} must be exactly {length} ASCII bytes"
+        )))
+    }
+}
+
+fn prefixed<'a>(token: &'a str, prefix: &str, body_len: usize) -> Result<&'a str, AppError> {
+    fixed(token, prefix.len() + body_len, prefix)?
+        .strip_prefix(prefix)
+        .ok_or_else(|| invalid(format!("expected {prefix}")))
+}
+
+fn parse_coordinate(
+    token: &str,
+    positive: char,
+    negative: char,
+    digits: usize,
+) -> Result<f64, AppError> {
+    fixed(token, digits + 1, "coordinate")?;
+    if token[1..].chars().all(|character| character == '/') {
+        return Ok(0.0);
+    }
+    let sign = match token.as_bytes()[0] as char {
+        value if value == positive => 1.0,
+        value if value == negative => -1.0,
+        _ => return Err(invalid("invalid coordinate hemisphere")),
+    };
+    let value = token[1..]
+        .parse::<u32>()
+        .map_err(|_| invalid("invalid coordinate digits"))?;
+    Ok(sign * f64::from(value) / 10.0)
+}
+
+fn parse_unknown_i64(token: &str, length: usize, field: &str) -> Result<i64, AppError> {
+    fixed(token, length, field)?;
+    if token.chars().all(|c| c == '/') {
+        return Ok(0);
+    }
+    token
+        .parse()
+        .map_err(|_| invalid(format!("invalid {field}")))
+}
+
+fn parse_unknown_decimal(token: &str, length: usize, field: &str) -> Result<f64, AppError> {
+    fixed(token, length, field)?;
+    if token.chars().all(|c| c == '/') {
+        return Ok(0.0);
+    }
+    token
+        .parse::<u32>()
+        .map(|value| f64::from(value) / 10.0)
+        .map_err(|_| invalid(format!("invalid {field}")))
+}
+
+fn invalid(message: impl Into<String>) -> AppError {
+    AppError::InvalidTelegram(message.into())
 }
 
 // CodeType 基本コード
@@ -304,7 +517,7 @@ fn rk2(code: &str) -> &'static str {
         "7" => "EPOS（海域〔観測網外〕）",
         "8" => "EPOS（内陸〔観測網内〕）",
         "9" => "予備",
-        "/ " => "不明、未設定時、キャンセル時",
+        "/" => "不明、未設定時、キャンセル時",
         _ => "",
     }
 }
@@ -480,6 +693,7 @@ fn warn_code(code: &str) -> &'static str {
         "7" => "訂正(キャンセル誤発表)",
         "8" => "訂正(予報)",
         "9" => "最終",
+        "/" => "不明、未設定時",
         _ => "",
     }
 }
@@ -1025,5 +1239,94 @@ fn chiiki_code(code: &str) -> &'static str {
         "806" => "沖縄県与那国島",
         "807" => "沖縄県西表島",
         _ => "",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::input::telegram_for_json;
+
+    const DATA: &str = include_str!("../data.txt");
+
+    #[test]
+    fn data_txt_regression_and_all_ebi_blocks() {
+        let decoded = decoder(DATA, telegram_for_json(DATA)).unwrap();
+        assert_eq!(decoded.EqID, "20240101161010");
+        assert_eq!(decoded.WarnNum, "46");
+        assert_eq!(decoded.ShinouLat, 37.6);
+        assert_eq!(decoded.ShinouLng, 137.2);
+        assert_eq!(decoded.ShinouDpth, 10);
+        assert_eq!(decoded.Magnitude, 7.4);
+        assert_eq!(decoded.Shindo, "7");
+        assert_eq!(decoded.Ebis.len(), 45);
+        assert!(decoded.Telegram.ends_with('='));
+        assert!(!decoded.Telegram.contains('\n'));
+    }
+
+    #[test]
+    fn single_line_and_multiline_telegrams_decode_identically() {
+        let single = telegram_for_json(DATA);
+        let multiline = single
+            .replacen(" C11 ", " C11\n", 1)
+            .replacen(" ND", "\nND", 1)
+            .replacen(" 495 ", "\n495 ", 1)
+            .replacen(" EBI ", "\nEBI ", 1)
+            .replacen(" 9999=", "\n9999=", 1);
+        let one = reader(&single).unwrap();
+        let many = reader(&multiline).unwrap();
+        assert_eq!(one.Ebis.len(), many.Ebis.len());
+        assert_eq!(one.EqID, many.EqID);
+        assert_eq!(one.Magnitude, many.Magnitude);
+    }
+
+    #[test]
+    fn south_and_west_coordinates_are_negative() {
+        let telegram = "37 03 00 260716090200 C11 260716090107 ND20260716090114 NCN001 JD////////////// JN/// 340 S357 W1407 050 45 03 RK44559 RT00/// RC0//// 9999=";
+        let decoded = decoder(telegram, telegram.to_string()).unwrap();
+        assert_eq!(decoded.ShinouLat, -35.7);
+        assert_eq!(decoded.ShinouLng, -140.7);
+    }
+
+    #[test]
+    fn slash_accuracy_values_decode_as_unknown() {
+        let telegram = "39 03 10 260716090200 C11 260716090107 ND20260716090114 NCN001 JD////////////// JN/// /// N/// E//// /// // // RK///// RT///// RC///// 9999=";
+        let decoded = decoder(telegram, telegram.to_string()).unwrap();
+        assert_eq!(decoded.CodeType, "キャンセル報");
+        assert_eq!(decoded.MsgType, "取り消し");
+        assert_eq!(decoded.EqID, "20260716090114");
+        assert_eq!(decoded.Rk1, "不明、未設定時、キャンセル時");
+        assert_eq!(decoded.Rk2, "不明、未設定時、キャンセル時");
+        assert_eq!(decoded.Rt2, "不明、未設定時、キャンセル時");
+        assert_eq!(decoded.Rc2, "不明、未設定時、キャンセル時");
+    }
+
+    #[test]
+    fn incomplete_telegram_is_an_error() {
+        let without_end = DATA.trim_end_matches('=').trim_end();
+        assert!(matches!(
+            reader(without_end),
+            Err(AppError::InvalidTelegram(_))
+        ));
+    }
+
+    #[test]
+    fn telegram_json_display_preserves_internal_spaces() {
+        let telegram = "37  03 00 260716090200 C11\n\n260716090107\nND20260716090114 NCN001 JD////////////// JN///\n340 N357 E1407 050 45 03 RK44559 RT00/// RC0////\n9999=";
+        let display = telegram_for_json(telegram);
+        assert!(display.starts_with("37  03"));
+        assert!(!display.contains('\n'));
+        let decoded = decoder(telegram, display.clone()).unwrap();
+        assert_eq!(decoded.Telegram, display);
+    }
+
+    #[test]
+    fn direct_code_48_warning_cancellation_is_supported() {
+        let telegram = "48 03 10 061004150300 C11 061004145930 ND20061004145955 NCPN02 9762 N336 E1362 040 PRC///// CAI //// CPI //// CBI /// PAI //// PPI //// PBI /// 9999=";
+        let decoded = decoder(telegram, telegram.to_string()).unwrap();
+        assert_eq!(decoded.MsgType, "取り消し");
+        assert_eq!(decoded.EqID, "20061004145955");
+        assert_eq!(decoded.WarnType, "一般向け");
+        assert_eq!(decoded.WarnNum, "02");
     }
 }
