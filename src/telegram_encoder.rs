@@ -162,7 +162,7 @@ fn forecast_core(
         rank(accuracy.epicenter_rank),
         rank(accuracy.depth_rank),
         rank(accuracy.magnitude_rank),
-        rank(accuracy.magnitude_stations),
+        char::from(b'0' + accuracy.magnitude_stations),
         rank(accuracy.epicenter_rank2)
     );
     let land = match (
@@ -652,6 +652,22 @@ mod tests {
         assert_eq!(final_report.WarnNum, "46");
         assert_eq!(final_report.WarnCode, "最終");
         assert_eq!(final_report.Ebis.len(), 45);
+    }
+
+    #[test]
+    fn zero_magnitude_calculation_count_is_preserved_in_rk() {
+        let xml = NOTO_FINAL.replace(
+            "<NumberOfMagnitudeCalculation>5</NumberOfMagnitudeCalculation>",
+            "<NumberOfMagnitudeCalculation>0</NumberOfMagnitudeCalculation>",
+        );
+
+        let (telegram, _) = round_trip(&xml);
+
+        assert!(telegram.contains("RK44509"));
+        assert!(!telegram.contains("RK445/9"));
+
+        // RC encoding must remain unchanged by this RK-only fix.
+        assert!(telegram.contains("RC00///"));
     }
 
     #[test]
