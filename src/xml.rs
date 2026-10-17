@@ -12,6 +12,7 @@ use roxmltree::{Document, Node, ParsingOptions};
 
 pub fn parse(raw: &str) -> Result<EewInformation, EewError> {
     let xml = raw.strip_prefix('\u{feff}').unwrap_or(raw).trim_start();
+    crate::input::check_xml_depth(xml)?;
     let doc = Document::parse_with_options(
         xml,
         ParsingOptions {

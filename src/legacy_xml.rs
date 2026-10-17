@@ -103,6 +103,7 @@ pub struct WarningAreas {
 
 pub fn parse(xml: &str) -> Result<EewXmlDocument, AppError> {
     let xml = xml.strip_prefix('\u{feff}').unwrap_or(xml);
+    crate::input::check_xml_depth(xml)?;
     let document = Document::parse(xml).map_err(|error| AppError::InvalidXml(error.to_string()))?;
     let root = document.root_element();
     if root.tag_name().name() != "Report" || root.tag_name().namespace() != Some(NS_REPORT) {

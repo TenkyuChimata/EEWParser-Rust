@@ -352,6 +352,19 @@ fn malicious_and_incomplete_inputs_fail_explicitly() {
     let xml=b"<!DOCTYPE Report [<!ENTITY x 'boom'>]><Report xmlns='http://xml.kishou.go.jp/jmaxml1/'>&x;</Report>";
     assert!(parse_xml(xml).is_err());
 }
+
+#[test]
+fn deeply_nested_xml_is_rejected_before_either_dom_can_overflow_the_stack() {
+    let xml = format!("{}{}", "<n>".repeat(5_000), "</n>".repeat(5_000));
+    for result in [parse_auto(xml.as_bytes()), parse_xml(xml.as_bytes())] {
+        assert!(matches!(result, Err(EewError::InvalidXml(s)) if s.contains("nesting")));
+    }
+    assert!(matches!(
+        encode_xml_as_telegram(xml.as_bytes()),
+        Err(EewError::InvalidXml(s)) if s.contains("nesting")
+    ));
+}
+
 #[test]
 fn fmt_detection_whitespace_bom_and_telegram_terminal() {
     let mut xml = b"\xef\xbb\xbf \n".to_vec();

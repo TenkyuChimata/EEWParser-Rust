@@ -173,6 +173,59 @@ pub fn telegram_for_json(content: &str) -> String {
         .join(" ")
 }
 
+// roxmltree 0.20 recursively parses element content. Bound nesting before
+// constructing either XML DOM; the byte/node limits do not bound stack usage.
+// This is only a lexical resource guard. roxmltree still validates XML syntax.
+pub(crate) fn check_xml_depth(mut xml: &str) -> Result<(), AppError> {
+    const MAX_DEPTH: usize = 128;
+    let invalid = |message: &str| AppError::InvalidXml(message.to_owned());
+    let mut depth = 0_usize;
+    'markup: while let Some(start) = xml.find('<') {
+        xml = &xml[start..];
+        for (prefix, end) in [("<!--", "-->"), ("<![CDATA[", "]]>"), ("<?", "?>")] {
+            if let Some(content) = xml.strip_prefix(prefix) {
+                let end_pos = content.find(end).ok_or_else(|| {
+                    invalid("unterminated XML comment, CDATA or processing instruction")
+                })?;
+                xml = &content[end_pos + end.len()..];
+                continue 'markup;
+            }
+        }
+        if xml.starts_with("<!") {
+            return Err(invalid("DTD and markup declarations are not supported"));
+        }
+        let closing = xml.starts_with("</");
+        let mut quote = None;
+        let mut end = None;
+        for (index, byte) in xml.bytes().enumerate().skip(1) {
+            match (quote, byte) {
+                (Some(q), b) if q == b => quote = None,
+                (Some(_), _) => {}
+                (None, b'\'' | b'"') => quote = Some(byte),
+                (None, b'>') => {
+                    end = Some(index);
+                    break;
+                }
+                (None, b'<') => return Err(invalid("unexpected < inside an XML tag")),
+                _ => {}
+            }
+        }
+        let end = end.ok_or_else(|| invalid("unterminated XML tag"))?;
+        if closing {
+            depth = depth.saturating_sub(1);
+        } else {
+            if depth >= MAX_DEPTH {
+                return Err(invalid("XML element nesting exceeds the 128-level limit"));
+            }
+            if xml.as_bytes()[end - 1] != b'/' {
+                depth += 1;
+            }
+        }
+        xml = &xml[end + 1..];
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -270,5 +323,34 @@ mod tests {
             crate::parse_telegram(&input),
             Err(AppError::InvalidTelegram(_))
         ));
+    }
+
+    #[test]
+    fn xml_depth_guard_counts_elements_and_skips_quoted_or_literal_markup() {
+        let at_limit = format!("{}<leaf/>{}", "<n>".repeat(127), "</n>".repeat(127));
+        assert!(check_xml_depth(&at_limit).is_ok());
+        assert!(roxmltree::Document::parse(&at_limit).is_ok());
+        let too_deep = format!("<n>{at_limit}</n>");
+        assert!(matches!(
+            check_xml_depth(&too_deep),
+            Err(AppError::InvalidXml(_))
+        ));
+        let literal = "<n>".repeat(5_000);
+        let xml = format!(
+            "<n a='>' b=\"/>\"><!--{literal}--><![CDATA[{literal}]]><?test {literal}?><leaf/></n>"
+        );
+        assert!(check_xml_depth(&xml).is_ok());
+        assert!(roxmltree::Document::parse(&xml).is_ok());
+        for malformed in [
+            "<n",
+            "<n a='",
+            "<n <n>",
+            "<!--",
+            "<![CDATA[",
+            "<?test",
+            "<!DOCTYPE n>",
+        ] {
+            assert!(check_xml_depth(malformed).is_err(), "{malformed}");
+        }
     }
 }
