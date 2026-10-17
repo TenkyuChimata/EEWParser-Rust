@@ -4,6 +4,9 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum AppError {
+    #[error("input exceeds the {limit}-byte limit")]
+    InputTooLarge { limit: usize },
+
     #[error("input is empty")]
     EmptyInput,
 

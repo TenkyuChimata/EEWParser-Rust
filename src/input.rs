@@ -3,6 +3,7 @@ use std::io::{self, Read};
 use std::path::Path;
 use std::str::FromStr;
 
+use crate::MAX_INPUT_BYTES;
 use crate::error::AppError;
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -45,8 +46,8 @@ pub struct RawInput {
 }
 
 pub fn read_file(path: impl AsRef<Path>, requested: InputFormat) -> Result<RawInput, AppError> {
-    let bytes = fs::read(path)?;
-    classify(std::str::from_utf8(&bytes)?.to_owned(), requested)
+    let file = fs::File::open(path)?;
+    read_stream(file, requested)
 }
 
 pub fn read_stdin(requested: InputFormat) -> Result<RawInput, AppError> {
@@ -58,16 +59,23 @@ pub fn read_stream<R: Read>(mut reader: R, requested: InputFormat) -> Result<Raw
     let mut bytes = Vec::new();
     let mut chunk = [0_u8; 8192];
     let mut detected = None;
+    let mut detection_position = 0;
 
     loop {
         let count = reader.read(&mut chunk)?;
         if count == 0 {
             break;
         }
+        if bytes.len() + count > MAX_INPUT_BYTES {
+            return Err(AppError::InputTooLarge {
+                limit: MAX_INPUT_BYTES,
+            });
+        }
+        let previous_length = bytes.len();
         bytes.extend_from_slice(&chunk[..count]);
 
         if detected.is_none() {
-            detected = detect_bytes(&bytes);
+            detected = detect_bytes(&bytes, &mut detection_position);
         }
 
         let effective = match requested {
@@ -75,9 +83,11 @@ pub fn read_stream<R: Read>(mut reader: R, requested: InputFormat) -> Result<Raw
             explicit => Some(explicit),
         };
         if effective == Some(InputFormat::Telegram)
-            && let Some(end) = bytes.iter().position(|byte| *byte == b'=')
+            && let Some(end) = bytes[previous_length..]
+                .iter()
+                .position(|byte| *byte == b'=')
         {
-            bytes.truncate(end + 1);
+            bytes.truncate(previous_length + end + 1);
             break;
         }
     }
@@ -86,6 +96,11 @@ pub fn read_stream<R: Read>(mut reader: R, requested: InputFormat) -> Result<Raw
 }
 
 pub fn classify(content: String, requested: InputFormat) -> Result<RawInput, AppError> {
+    if content.len() > MAX_INPUT_BYTES {
+        return Err(AppError::InputTooLarge {
+            limit: MAX_INPUT_BYTES,
+        });
+    }
     let actual = detect(&content).ok_or(AppError::EmptyInput)?;
     if requested != InputFormat::Auto && requested != actual {
         return Err(AppError::InputFormatConflict {
@@ -110,8 +125,34 @@ pub fn detect(content: &str) -> Option<InputFormat> {
     })
 }
 
-fn detect_bytes(bytes: &[u8]) -> Option<InputFormat> {
-    std::str::from_utf8(bytes).ok().and_then(detect)
+// Examine only the undecided UTF-8 prefix. A split multibyte character or BOM
+// is retried when complete, without repeatedly scanning all prior whitespace.
+fn detect_bytes(bytes: &[u8], position: &mut usize) -> Option<InputFormat> {
+    if *position == 0 {
+        const BOM: &[u8] = b"\xef\xbb\xbf";
+        if bytes.len() < BOM.len() && BOM.starts_with(bytes) {
+            return None;
+        }
+        if bytes.starts_with(BOM) {
+            *position = BOM.len();
+        }
+    }
+    let suffix = &bytes[*position..];
+    let valid = match std::str::from_utf8(suffix) {
+        Ok(s) => s,
+        Err(e) => std::str::from_utf8(&suffix[..e.valid_up_to()]).expect("validated UTF-8 prefix"),
+    };
+    for c in valid.chars() {
+        if !c.is_whitespace() {
+            return Some(if c == '<' {
+                InputFormat::Xml
+            } else {
+                InputFormat::Telegram
+            });
+        }
+        *position += c.len_utf8();
+    }
+    None
 }
 
 pub fn telegram_through_terminator(content: &str) -> Result<&str, AppError> {
@@ -188,6 +229,46 @@ mod tests {
         assert!(matches!(
             classify("\u{feff} \n\t".to_string(), InputFormat::Auto),
             Err(AppError::EmptyInput)
+        ));
+    }
+    #[test]
+    fn one_byte_chunks_preserve_split_bom_and_unicode_whitespace() {
+        struct OneByte(Cursor<Vec<u8>>);
+        impl Read for OneByte {
+            fn read(&mut self, out: &mut [u8]) -> io::Result<usize> {
+                let len = out.len().min(1);
+                self.0.read(&mut out[..len])
+            }
+        }
+        let payload = "\u{feff}\u{3000}  <Report a=\"x\"/>";
+        let result = read_stream(
+            OneByte(Cursor::new(payload.as_bytes().to_vec())),
+            InputFormat::Auto,
+        )
+        .unwrap();
+        assert_eq!(result.format, InputFormat::Xml);
+        assert_eq!(result.content, payload);
+    }
+    #[test]
+    fn unterminated_and_whitespace_streams_obey_the_memory_bound() {
+        let input = io::repeat(b' ').take(MAX_INPUT_BYTES as u64 + 1);
+        assert!(matches!(
+            read_stream(input, InputFormat::Auto),
+            Err(AppError::InputTooLarge { .. })
+        ));
+        let input = Cursor::new(
+            b"37 "
+                .iter()
+                .copied()
+                .chain(std::iter::repeat_n(b'0', 24_000))
+                .collect::<Vec<_>>(),
+        );
+        assert!(read_stream(input, InputFormat::Telegram).is_ok());
+        // read_stream classifies complete bytes; parse_telegram diagnoses the missing terminator.
+        let input = vec![b'0'; 24_000];
+        assert!(matches!(
+            crate::parse_telegram(&input),
+            Err(AppError::InvalidTelegram(_))
         ));
     }
 }

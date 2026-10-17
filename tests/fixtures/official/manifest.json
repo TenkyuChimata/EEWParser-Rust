@@ -1,0 +1,636 @@
+[
+  {
+    "path": "rti-first.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230505215718/vxse47/xml/VXSE47_RJTD_20230505125812054_f9b6fd5.xml",
+    "sha256": "5c2c1e964d16029c7589c46d90a1b63b7706640a839f34f64f7bef67d688f6dc"
+  },
+  {
+    "path": "rti-last.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230505215718/vxse47/xml/VXSE47_RJTD_20230505125941557_1d7acd8.xml",
+    "sha256": "d19c013300840437edbc745a80689a77aece9e50b07bf196b2876aa509047650"
+  },
+  {
+    "path": "rti-first.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/eew/20230505215718/vxse47/json/VXSE47_RJTD_20230505125812067_684f76b.json",
+    "sha256": "d17edbad7df116be37ae8d76db16554e39638c8274d428f8ad43121ceb9bbbe4"
+  },
+  {
+    "path": "rti-last.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/eew/20230505215718/vxse47/json/VXSE47_RJTD_20230505125941570_8bf500a.json",
+    "sha256": "fb0224db48f9cb5cdddecee3ee27e2b7d7cd4043a7dcaa7023368acd819b0c65"
+  },
+  {
+    "path": "plum-first.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230505215718/vxse45/xml/VXSE45_RJTD_20230505125812105_9654b10.xml",
+    "sha256": "4674a317db64ab736d2918c6279526cdedf1684a2cd10a91880c2ff751356ed1"
+  },
+  {
+    "path": "plum-first.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/eew/20230505215718/vxse45/json/VXSE45_RJTD_20230505125812118_e43c03a.json",
+    "sha256": "d9128f84427af3364b93d30f0fa56d3369ef5c4321ec7bfdfd93785d2680b050"
+  },
+  {
+    "path": "plum-warning-first.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230505215718/vxse43/xml/VXSE43_RJTD_20230505125817009_598f2b7.xml",
+    "sha256": "0e5866c123e4959d84e106f9c0d3dc05e293ad00197581442a2c46dddf8557f1"
+  },
+  {
+    "path": "plum-warning-first.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/eew/20230505215718/vxse43/json/VXSE43_RJTD_20230505125817021_5ff1300.json",
+    "sha256": "137b24fd20add01f854a17c00fb3f6ca0fbb0e74ff570bbbf897f93c55e15d93"
+  },
+  {
+    "path": "100gal-first.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230513161031/vxse45/xml/VXSE45_JPOS_20230513071032948_51f526b.xml",
+    "sha256": "c8fe5c5c718fc2699fa673306ff8562b4f1b402ef6a9fdfa787b8e069359a2ef"
+  },
+  {
+    "path": "100gal-first.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/eew/20230513161031/vxse45/json/VXSE45_JPOS_20230513071032964_4221c6f.json",
+    "sha256": "766e2e1075b86625075dcf3bccf51a13f4a6192629655e47d975115b22582944"
+  },
+  {
+    "path": "noto-first.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20240101161010/vxse45/xml/VXSE45_RJTD_20240101071016067_2e3c66b.xml",
+    "sha256": "186b56f2894e98480c483c985826dcfcfc1bdcf1d1e6d7bc797ef0e7deb4881b"
+  },
+  {
+    "path": "noto-last.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20240101161010/vxse45/xml/VXSE45_RJTD_20240101071418538_2217957.xml",
+    "sha256": "a816776a55655fc045e732c01a8f88e699654199490b7b3574c5916b78903748"
+  },
+  {
+    "path": "noto-first.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/eew/20240101161010/vxse45/json/VXSE45_RJTD_20240101071016079_0cc83ce.json",
+    "sha256": "9d1d5900ecbd3b5d5b1faa816bb755ac3804d1253b8bd36871dc5bf05290e2db"
+  },
+  {
+    "path": "noto-last.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/eew/20240101161010/vxse45/json/VXSE45_RJTD_20240101071418555_91b6ff0.json",
+    "sha256": "1582ca8a838bcf5acfbb40d3ab3cf7e60190017a6e879983083144db95b5312a"
+  },
+  {
+    "path": "cancel-first.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230906063640/vxse45/xml/VXSE45_JPOS_20230905213732961_8225189.xml",
+    "sha256": "a3a95b236818d49e0bf2678e510ce63b3731fcc255af22aff6d16f5477f2e490"
+  },
+  {
+    "path": "cancel-last.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230906063640/vxse45/xml/VXSE45_JPOS_20230905213752660_4949e2a.xml",
+    "sha256": "117a4788c893a4e0b1ead2b991c793927768dcc707304aacb68873c38fa7a8d7"
+  },
+  {
+    "path": "cancel-first.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/eew/20230906063640/vxse45/json/VXSE45_JPOS_20230905213732971_ec1b63d.json",
+    "sha256": "a71db3f84e089ea6449611f857327ab6aadc62cf61a1b25379cf00cd06f49a91"
+  },
+  {
+    "path": "cancel-last.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/eew/20230906063640/vxse45/json/VXSE45_JPOS_20230905213752676_98327b3.json",
+    "sha256": "8f0415ed28bd4ee3dc1fe79849e192bf9d062b74e51072cb7938f67e907376bd"
+  },
+  {
+    "path": "vxse42_rjtd_20090811050000.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/conversion/json/schema/eew-information/vxse42_rjtd_20090811050000.json",
+    "sha256": "c085b7504becc6dd415d47d9073b319e65a9f5c51ec2db5e0a2a8b8578e0f9e2"
+  },
+  {
+    "path": "vxse43_rjtd_20110311144810.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/conversion/json/schema/eew-information/vxse43_rjtd_20110311144810.json",
+    "sha256": "d64bef5fcd02012d80764d5e4244e8a8b97223d92b210ba031f2104969d7aea6"
+  },
+  {
+    "path": "vxse43_rjtd_20110311145000.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/conversion/json/schema/eew-information/vxse43_rjtd_20110311145000.json",
+    "sha256": "ac302c0f807eefd5e61c28e66c9d2db55102ea0267bc3355a1ee479ae4e340d1"
+  },
+  {
+    "path": "vxse44_rjtd_20180906031016.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/conversion/json/schema/eew-information/vxse44_rjtd_20180906031016.json",
+    "sha256": "8f8a1fa474192b573af94088efd5e193d572fa1f55216d158f7fff3ac76cc240"
+  },
+  {
+    "path": "vxse45_rjtd_20110311144810.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/conversion/json/schema/eew-information/vxse45_rjtd_20110311144810.json",
+    "sha256": "81f8029d73ee7da21fe8958f3e0362ad0ff8695dd48587061c85cc63277e4e6f"
+  },
+  {
+    "path": "vxse45_rjtd_20110311144811.json",
+    "kind": "Observed DMDATA JSON",
+    "url": "https://sample.dmdata.jp/conversion/json/schema/eew-information/vxse45_rjtd_20110311144811.json",
+    "sha256": "5aebda137b1637823944844347f7ad2ff83714328ebdabdcd786fa0338b40ced"
+  },
+  {
+    "path": "36_01_01_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_01_240613_VXSE44.xml",
+    "sha256": "ee5648d07f7b8f0714cbef789f47bc68306b41cc5d8d3bb2ba7ecf6fbafc135b"
+  },
+  {
+    "path": "36_01_02_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_02_240613_VXSE44.xml",
+    "sha256": "ed28fede99a20f46e8922e714698aa3df59fecdd28096759295028ab63d75cfc"
+  },
+  {
+    "path": "36_01_03_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_03_240613_VXSE44.xml",
+    "sha256": "ead6facf8748635b880459a3002629038c6dda9c1d0ec3ade1442e02b05eeb4a"
+  },
+  {
+    "path": "36_01_04_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_04_240613_VXSE44.xml",
+    "sha256": "f221a39743b1663a4640c4e02d0a98e6a74a53e4bb3544ce199f50f535792403"
+  },
+  {
+    "path": "36_01_05_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_05_240613_VXSE44.xml",
+    "sha256": "affc890936fd7bf63f99d3e8ff2baac87188172632ce76b718fe28660bcc2c4a"
+  },
+  {
+    "path": "36_01_06_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_06_240613_VXSE44.xml",
+    "sha256": "26dd45d3d0604c62838e907deed866c944beb8c5fa2598a87a5e0e781f72c9da"
+  },
+  {
+    "path": "36_01_07_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_07_240613_VXSE44.xml",
+    "sha256": "d2a467ae6e2265a203fae298ff54f6cb855363118c8067ec0a1a3d35cef6e5d0"
+  },
+  {
+    "path": "36_01_08_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_08_240613_VXSE44.xml",
+    "sha256": "6889579039c2a726236437134fed44b17661e9ade37cd885f0f70bb24933e3ff"
+  },
+  {
+    "path": "36_01_09_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_09_240613_VXSE44.xml",
+    "sha256": "99a028281190c10caaade26df295223230c48141154204b3a2bce07a1a62c0bd"
+  },
+  {
+    "path": "36_01_10_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_10_240613_VXSE44.xml",
+    "sha256": "de3f4c1b5755cf428a2e513dad86d6bd7a0cbfc09f658af2bf554a0f71ed7f8c"
+  },
+  {
+    "path": "36_01_11_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_11_240613_VXSE44.xml",
+    "sha256": "3341ce82b8c731aefb2de57c71cd1e344a74c7a1b23529f6800ba649e7d20ce2"
+  },
+  {
+    "path": "36_01_12_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_12_240613_VXSE44.xml",
+    "sha256": "e74b3b1b1eb20aa26da7717c8472682298972af5271fd659b0a5aee17f2acfe2"
+  },
+  {
+    "path": "36_01_13_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_13_240613_VXSE44.xml",
+    "sha256": "3cf885779e6fdff1edbc7182a62f3a2a5f47db53f463886e0b8c84d63d04a77f"
+  },
+  {
+    "path": "36_01_14_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_14_240613_VXSE44.xml",
+    "sha256": "a389702a61b6ea30a2660f1d5f284a1527d4af221ba1d0eb964d88c0a35bd915"
+  },
+  {
+    "path": "36_01_15_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_15_240613_VXSE44.xml",
+    "sha256": "fbe48fa7e7cb4981378be100fb89213ced093dc76e3ed4e70b8585aac3b3f5cc"
+  },
+  {
+    "path": "36_01_16_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_16_240613_VXSE44.xml",
+    "sha256": "bc713b604d9956348f5cddff8dd8924d8768655cda7011da779e62e066460c5f"
+  },
+  {
+    "path": "36_01_17_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_17_240613_VXSE44.xml",
+    "sha256": "715fb513609ad9fcc4f4bb26d42d475d6ce7b34fd1c77840dbb6a264e2212aa9"
+  },
+  {
+    "path": "36_01_18_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_18_240613_VXSE44.xml",
+    "sha256": "e6d59edd922f28d3564b695df424735d6483dc2d49ca2686d9d2960f5c1d2586"
+  },
+  {
+    "path": "36_01_19_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_19_240613_VXSE44.xml",
+    "sha256": "d5a8f10120d00da31e16f93a303a39a0bfa3259e8785b31248e8cf7f1383d90c"
+  },
+  {
+    "path": "36_01_20_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_20_240613_VXSE44.xml",
+    "sha256": "ff14abda0d35d71881109109749644a4173b25e594e3fb28cd87859577b6f651"
+  },
+  {
+    "path": "36_01_21_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_21_240613_VXSE44.xml",
+    "sha256": "87267061aad7ed4499fc667cfdbdbcd1d24d13d1dad37224689e4dffa12e0aae"
+  },
+  {
+    "path": "36_01_22_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_22_240613_VXSE44.xml",
+    "sha256": "3ff2ac078afb32b4f1c2d15320aff9a97c99570122d368752a0f39625c1cb7d4"
+  },
+  {
+    "path": "36_01_23_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_23_240613_VXSE44.xml",
+    "sha256": "75cd824a41a582721b56ea8391d1a7319b73b92d7b39021f7d5d6190c52593ac"
+  },
+  {
+    "path": "36_01_24_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_24_240613_VXSE44.xml",
+    "sha256": "4573e4d6896ed57f7e6a6697aae96888e4e01ef01e2ab6562caa36f5543ddaf9"
+  },
+  {
+    "path": "36_01_25_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_25_240613_VXSE44.xml",
+    "sha256": "401bfeffe47c5e1e553559c724c989495b88a7c38eef8a39f93804859c3ff3db"
+  },
+  {
+    "path": "36_01_26_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_26_240613_VXSE44.xml",
+    "sha256": "1a83095ba5e421cf9b47a4c7468693aca19d03af9ed84b7d817ed54cff9ec8d1"
+  },
+  {
+    "path": "36_01_27_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_27_240613_VXSE44.xml",
+    "sha256": "fa8c4415e9dbcc4c196a10fc54459445f771ea05f6ab344363d8b3ff90725a84"
+  },
+  {
+    "path": "36_01_28_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_28_240613_VXSE44.xml",
+    "sha256": "0abf654084ff5b39287451a64d1e867497f2aa9c4074b0d94667cbd20664286b"
+  },
+  {
+    "path": "36_01_29_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_29_240613_VXSE44.xml",
+    "sha256": "35cc4389ff37be7df9620f30c977ea454a53842de68976fd78950e4851b40900"
+  },
+  {
+    "path": "36_01_30_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_30_240613_VXSE44.xml",
+    "sha256": "955a37b1833a182261d2bbac5a2dbbb722ef799e86b2037bb5915043726a2802"
+  },
+  {
+    "path": "36_01_31_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_31_240613_VXSE44.xml",
+    "sha256": "bbad4398f832dfeaced01d66320f5e063d774be55b3737dfad30f42010ee43c9"
+  },
+  {
+    "path": "36_01_32_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_32_240613_VXSE44.xml",
+    "sha256": "9c6a707facd8a1c6ab6268a87d6ebfd8b746e317920d1b2ea0204defaf5cfd9e"
+  },
+  {
+    "path": "36_01_33_240613_VXSE44.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "36_01_33_240613_VXSE44.xml",
+    "sha256": "88892d8c8204db8a5ca54d4e8ec0dddf98acf4cbe731dd6a8d03910347622820"
+  },
+  {
+    "path": "37_01_01_240613_VXSE43.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "37_01_01_240613_VXSE43.xml",
+    "sha256": "66ac00a126d831135ce40baea8de5b3c5e58342c607d04f4ef00520a6861fcc0"
+  },
+  {
+    "path": "37_01_02_240613_VXSE43.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "37_01_02_240613_VXSE43.xml",
+    "sha256": "fe5593f0c2b564b4a4fde3960941bd435c57c19f4707e81bc67942a5d52f8de9"
+  },
+  {
+    "path": "37_01_03_240613_VXSE43.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "37_01_03_240613_VXSE43.xml",
+    "sha256": "b075dab492ed0369c8dca5203bb9b273a71dd8cdeed4be37a84de00e557fcafc"
+  },
+  {
+    "path": "54_01_01_100514_VXSE42.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "54_01_01_100514_VXSE42.xml",
+    "sha256": "81155fd2bfe48fc4e384dd7f27c9f5400d79790056250ffc6a4640bf589b548d"
+  },
+  {
+    "path": "77_01_01_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_01_240613_VXSE45.xml",
+    "sha256": "05aabbf0667f30f4248b464207d7335afda83c69d22a7cd1a300fec847074575"
+  },
+  {
+    "path": "77_01_02_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_02_240613_VXSE45.xml",
+    "sha256": "074152bb47c40c735d288062f4fe7336b874103b2969f6c208fad7dd297fa2ef"
+  },
+  {
+    "path": "77_01_03_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_03_240613_VXSE45.xml",
+    "sha256": "f50d96976f3de0f0976b4746bec9d6946728f4accad6892b166fadefb4d43b4b"
+  },
+  {
+    "path": "77_01_04_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_04_240613_VXSE45.xml",
+    "sha256": "793691cd6918efc1fb9060fd7b24ed2594cfcfdcceb3996845ed7ecf50d99e2f"
+  },
+  {
+    "path": "77_01_05_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_05_240613_VXSE45.xml",
+    "sha256": "58e68bd5ff8e282d81f3a56ac9cf5b9cc18af62b6d2d9408a45821ec37322d91"
+  },
+  {
+    "path": "77_01_06_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_06_240613_VXSE45.xml",
+    "sha256": "aa58f0a43ae859d27445d2d6d6c637ab049d84debdb69cc797acdc05f5f538cb"
+  },
+  {
+    "path": "77_01_07_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_07_240613_VXSE45.xml",
+    "sha256": "d09cd066d4972f0be8eec4df3bf576d79918651e3d5900fb4a1df4d7b1e384e9"
+  },
+  {
+    "path": "77_01_08_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_08_240613_VXSE45.xml",
+    "sha256": "af7ded82974e8f98e1bb5088476476501c6ff55751030a41e5b3fd44a5e47ea5"
+  },
+  {
+    "path": "77_01_09_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_09_240613_VXSE45.xml",
+    "sha256": "eb1998d1d1b113024f24e0c191157684c6d6fe37651ca8dff07052c2e9023047"
+  },
+  {
+    "path": "77_01_10_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_10_240613_VXSE45.xml",
+    "sha256": "000697343badc0cbb7c84139cb5701b6e10163e9d991d02ad75fe65c952203f4"
+  },
+  {
+    "path": "77_01_11_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_11_240613_VXSE45.xml",
+    "sha256": "245a3148f09e69435ff54777c11965e1b8cc5c491e950d9c99776530a9307409"
+  },
+  {
+    "path": "77_01_12_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_12_240613_VXSE45.xml",
+    "sha256": "3b29fbcf1a46258b7eac0033ec4e37be833de4e0fb7ce5c5d5b0880acfd25f8e"
+  },
+  {
+    "path": "77_01_13_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_13_240613_VXSE45.xml",
+    "sha256": "a5adf6dcdaf53333d76a4740004247eb738ac713eaa2405461dbd93b8e28908e"
+  },
+  {
+    "path": "77_01_14_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_14_240613_VXSE45.xml",
+    "sha256": "f93a8177edde2f17c581015d2b7a6027409082b8a5c690a246f7790cef4457a4"
+  },
+  {
+    "path": "77_01_15_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_15_240613_VXSE45.xml",
+    "sha256": "cd94681db68a270245c65b1be13d2b69e88a6524c7f58345b9dff98961192495"
+  },
+  {
+    "path": "77_01_16_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_16_240613_VXSE45.xml",
+    "sha256": "bee4cb07efbf227648a01e3a34cb090ff6155b245a351c43867f8dbd76de425e"
+  },
+  {
+    "path": "77_01_17_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_17_240613_VXSE45.xml",
+    "sha256": "3b61dc57f39b2c1f2d21cf5c2dded875d123bf5b9d645f725aab1d561e2ead04"
+  },
+  {
+    "path": "77_01_18_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_18_240613_VXSE45.xml",
+    "sha256": "da70338665e0fb5694772155f36bae8b0023cde8857221d4868096575d9785c0"
+  },
+  {
+    "path": "77_01_19_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_19_240613_VXSE45.xml",
+    "sha256": "6e6430cb70f5c48ad22fa93034962200c303a10b0b55a32204841437f13093cc"
+  },
+  {
+    "path": "77_01_20_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_20_240613_VXSE45.xml",
+    "sha256": "12cbad74f0f21f27fd3d2324a837f88c340c92189d5f6f36da22ef661ffdc0a8"
+  },
+  {
+    "path": "77_01_21_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_21_240613_VXSE45.xml",
+    "sha256": "a59785b0ae25728c3111cd020807f0d37947c3ae834d43ba0c5a855bf0e9b78e"
+  },
+  {
+    "path": "77_01_22_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_22_240613_VXSE45.xml",
+    "sha256": "cad1c62cde057e424a96911f8e26aea4f0dd843cddf84ecf04d4a9f0e75195b1"
+  },
+  {
+    "path": "77_01_23_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_23_240613_VXSE45.xml",
+    "sha256": "1d8c73148c94bd4a248c7ca65d7b3ae24d41ff1f09c8b4dc6aeaa893adcf3798"
+  },
+  {
+    "path": "77_01_24_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_24_240613_VXSE45.xml",
+    "sha256": "385c16f63537eae6adc716c0dc77dfcad287b6495bb6a383b27be354f8af16b7"
+  },
+  {
+    "path": "77_01_25_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_25_240613_VXSE45.xml",
+    "sha256": "394e553beee16a84a9d9ae37a8445456f02115b1b4baabe52032c3bfb2379b3a"
+  },
+  {
+    "path": "77_01_26_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_26_240613_VXSE45.xml",
+    "sha256": "4ee6ba42d8e8b45891b1930cff5f6eab08a181632f31192f3466029f4cfa8001"
+  },
+  {
+    "path": "77_01_27_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_27_240613_VXSE45.xml",
+    "sha256": "df243aa44612a914011f01cd27e77866fd8396b1a2fc9a904bfe38d4f0df7f86"
+  },
+  {
+    "path": "77_01_28_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_28_240613_VXSE45.xml",
+    "sha256": "442e9b30c2cc2c6441977ee8a4f361f7c43c52a7b297d47862a4886d0befa03d"
+  },
+  {
+    "path": "77_01_29_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_29_240613_VXSE45.xml",
+    "sha256": "8327f0b5e3cd745b85c34591de4392975cea1645a9a3dcf28c5d069013c57039"
+  },
+  {
+    "path": "77_01_30_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_30_240613_VXSE45.xml",
+    "sha256": "e55cc819b978e3a363f78e59d33de3bfb6342ab1b8e98c1835dddac31c68c3f9"
+  },
+  {
+    "path": "77_01_31_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_31_240613_VXSE45.xml",
+    "sha256": "0ea0247b51e8362f5a679ed1d1bb188dfac6da8acd7c63df7c666b50a44e0521"
+  },
+  {
+    "path": "77_01_32_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_32_240613_VXSE45.xml",
+    "sha256": "8405710f7e72e205808014644472d1c0ec630aab934e9e5225e2d0dae7f5e0ee"
+  },
+  {
+    "path": "77_01_33_240613_VXSE45.xml",
+    "kind": "Official XML",
+    "url": "https://xml.kishou.go.jp/jmaxml_20260917_Samples.zip",
+    "member": "77_01_33_240613_VXSE45.xml",
+    "sha256": "9435c51f12b016c07bd0482033f3cdbc7fdf11250d8789f1db7423758a11d62b"
+  }
+]

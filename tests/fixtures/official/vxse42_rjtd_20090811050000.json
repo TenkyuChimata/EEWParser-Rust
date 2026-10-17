@@ -1,0 +1,28 @@
+{
+    "_originalId": "TELEGRAM_ID",
+    "_schema": {
+        "type": "eew-information",
+        "version": "1.0.0"
+    },
+    "type": "緊急地震速報配信テスト",
+    "title": "緊急地震速報配信テスト",
+    "status": "試験",
+    "infoType": "発表",
+    "editorialOffice": "気象庁本庁",
+    "publishingOffice": [
+        "気象庁"
+    ],
+    "pressDateTime": "2009-08-10T20:00:00Z",
+    "reportDateTime": "2009-08-11T05:00:00+09:00",
+    "targetDateTime": "2009-08-11T05:00:00+09:00",
+    "eventId": "20090811050000",
+    "serialNo": "1",
+    "infoKind": "緊急地震速報",
+    "infoKindVersion": "1.0_0",
+    "headline": null,
+    "body": {
+        "isLastInfo": false,
+        "isCanceled": false,
+        "text": "緊急地震速報のテスト電文です。"
+    }
+}

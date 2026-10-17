@@ -1,7 +1,7 @@
 use chrono::{DateTime, FixedOffset};
 
 use crate::error::AppError;
-use crate::xml::{
+use crate::legacy_xml::{
     Earthquake, EewXmlDocument, Forecast, ForecastArea, InfoType, IntensityRange, WarningAreas,
     XmlProduct,
 };
@@ -337,6 +337,8 @@ fn warning_lines(document: &EewXmlDocument) -> Result<Vec<String>, AppError> {
         document.event_id,
         if document.final_report { '9' } else { '0' }
     );
+    // Official NCP starts at ND; the event time occurs only in the outer block.
+    nested.remove(0);
     lines.extend(nested);
     Ok(lines)
 }
@@ -505,10 +507,7 @@ fn serial_code(serial: u16) -> Result<String, AppError> {
 }
 
 fn warning_serial_code(serial: u16) -> Result<String, AppError> {
-    match serial {
-        1..=99 => Ok(format!("{serial:02}")),
-        _ => Err(missing("warning Serial must fit the NCPN 01..99 range")),
-    }
+    serial_code(serial)
 }
 
 fn section_code(office: &str) -> Result<&'static str, AppError> {
@@ -570,7 +569,7 @@ mod tests {
     const NOTO_CANCEL: &str = include_str!("../tests/fixtures/official_noto_cancellation.xml");
 
     fn round_trip(xml_source: &str) -> (String, crate::parser::Telegram) {
-        let document = crate::xml::parse(xml_source).unwrap();
+        let document = crate::legacy_xml::parse(xml_source).unwrap();
         let telegram = encode(&document).unwrap();
         let decoded = decoder(&telegram, telegram_for_json(&telegram)).unwrap();
         (telegram, decoded)
@@ -582,8 +581,8 @@ mod tests {
         assert!(telegram.starts_with("35 04 00 230513161032 C11\n"));
         assert_eq!(decoded.EqID, "20230513161031");
         assert_eq!(decoded.EqTime, "20230513161031");
-        assert_eq!(decoded.ShinouLat, 29.8);
-        assert_eq!(decoded.ShinouLng, 129.9);
+        assert_eq!(decoded.ShinouLat, Some(29.8));
+        assert_eq!(decoded.ShinouLng, Some(129.9));
         assert_eq!(decoded.Shindo, "5弱");
         assert!(decoded.Ebis.is_empty());
         assert!(decoded.Telegram.ends_with("9999="));
@@ -618,7 +617,7 @@ mod tests {
 
     #[test]
     fn official_forecast_cancellation_reports_irrecoverable_required_time() {
-        let document = crate::xml::parse(PLUM_CANCEL).unwrap();
+        let document = crate::legacy_xml::parse(PLUM_CANCEL).unwrap();
         assert_eq!(select_code_type(&document).unwrap(), "39");
         assert!(
             matches!(encode(&document), Err(AppError::Unsupported { reason, .. }) if reason.contains("occurrence/detection time"))
@@ -641,10 +640,10 @@ mod tests {
         assert!(telegram.starts_with("37 "));
         assert_eq!(first.EqID, "20240101161010");
         assert_eq!(first.WarnNum, "01");
-        assert_eq!(first.ShinouLat, 37.5);
-        assert_eq!(first.ShinouLng, 137.2);
-        assert_eq!(first.ShinouDpth, 10);
-        assert_eq!(first.Magnitude, 5.5);
+        assert_eq!(first.ShinouLat, Some(37.5));
+        assert_eq!(first.ShinouLng, Some(137.2));
+        assert_eq!(first.ShinouDpth, Some(10));
+        assert_eq!(first.Magnitude, Some(5.5));
 
         let (final_telegram, final_report) = round_trip(NOTO_FINAL);
         assert!(final_telegram.starts_with("37 "));
@@ -672,7 +671,7 @@ mod tests {
 
     #[test]
     fn official_noto_cancellation_reports_irrecoverable_required_time() {
-        let document = crate::xml::parse(NOTO_CANCEL).unwrap();
+        let document = crate::legacy_xml::parse(NOTO_CANCEL).unwrap();
         assert_eq!(document.event_id, "20240101161133");
         assert_eq!(document.info_type, InfoType::Cancellation);
         assert_eq!(select_code_type(&document).unwrap(), "39");
@@ -692,8 +691,8 @@ mod tests {
             );
         let (telegram, decoded) = round_trip(&xml);
         assert!(telegram.contains(" S298 W1299 010 "));
-        assert_eq!(decoded.ShinouLat, -29.8);
-        assert_eq!(decoded.ShinouLng, -129.9);
+        assert_eq!(decoded.ShinouLat, Some(-29.8));
+        assert_eq!(decoded.ShinouLng, Some(-129.9));
     }
 
     #[test]
@@ -729,12 +728,12 @@ mod tests {
     #[test]
     fn malformed_and_non_eew_xml_are_rejected() {
         assert!(matches!(
-            crate::xml::parse("<Report>"),
+            crate::legacy_xml::parse("<Report>"),
             Err(AppError::InvalidXml(_))
         ));
         let non_eew = GAL_100.replace("緊急地震速報（地震動予報）", "震源・震度に関する情報");
         assert!(matches!(
-            crate::xml::parse(&non_eew),
+            crate::legacy_xml::parse(&non_eew),
             Err(AppError::UnsupportedXml(_))
         ));
     }
@@ -743,7 +742,7 @@ mod tests {
     fn missing_required_event_id_is_rejected() {
         let xml = GAL_100.replace("<EventID>20230513161031</EventID>", "");
         assert!(matches!(
-            crate::xml::parse(&xml),
+            crate::legacy_xml::parse(&xml),
             Err(AppError::MissingXmlField(_))
         ));
     }
@@ -752,12 +751,12 @@ mod tests {
     fn unrepresentable_depth_and_unknown_selection_rank_are_rejected() {
         let fractional_depth = GAL_100.replace("+29.8+129.9-10000/", "+29.8+129.9-10500/");
         assert!(matches!(
-            crate::xml::parse(&fractional_depth),
+            crate::legacy_xml::parse(&fractional_depth),
             Err(AppError::MissingXmlField(_))
         ));
 
         let unknown_rank = NOTO_FIRST.replacen("<Epicenter rank=\"3\"", "<Epicenter rank=\"0\"", 1);
-        let document = crate::xml::parse(&unknown_rank).unwrap();
+        let document = crate::legacy_xml::parse(&unknown_rank).unwrap();
         assert!(matches!(
             encode(&document),
             Err(AppError::Unsupported { reason, .. }) if reason.contains("cannot determine")
@@ -775,7 +774,7 @@ mod tests {
 
         let correction = GAL_100.replace("<InfoType>発表</InfoType>", "<InfoType>訂正</InfoType>");
         assert!(matches!(
-            crate::xml::parse(&correction),
+            crate::legacy_xml::parse(&correction),
             Err(AppError::Unsupported { .. })
         ));
 

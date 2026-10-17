@@ -1,0 +1,74 @@
+[
+  {
+    "path": "manual-35.telegram",
+    "kind": "Official Telegram",
+    "source": "https://www.data.jma.go.jp/suishin/shiyou/pdf/no40202",
+    "sourceVersion": "2023-02-01 index; code-manual content March 2020",
+    "pdfPage": 20,
+    "sha256": "2324e2176264b5986ac2f2cbdfc2d859821601f76dcb989577c5edf5b9be08db",
+    "note": "Extracted code block (and appended text for 38); PDF layout whitespace normalized; no network envelope."
+  },
+  {
+    "path": "manual-36.telegram",
+    "kind": "Official Telegram",
+    "source": "https://www.data.jma.go.jp/suishin/shiyou/pdf/no40202",
+    "sourceVersion": "2023-02-01 index; code-manual content March 2020",
+    "pdfPage": 21,
+    "sha256": "88d94eaf4dc776ac8f162587a03295cb54bde3ac854aca79edea768c63c2a28b",
+    "note": "Extracted code block (and appended text for 38); PDF layout whitespace normalized; no network envelope."
+  },
+  {
+    "path": "manual-37.telegram",
+    "kind": "Official Telegram",
+    "source": "https://www.data.jma.go.jp/suishin/shiyou/pdf/no40202",
+    "sourceVersion": "2023-02-01 index; code-manual content March 2020",
+    "pdfPage": 22,
+    "sha256": "1db0b2645f887db93fa56837a6f4bcf6a9a58b5d04f81068b81db64f721766f4",
+    "note": "Extracted code block (and appended text for 38); PDF layout whitespace normalized; no network envelope."
+  },
+  {
+    "path": "manual-38.telegram",
+    "kind": "Official Telegram",
+    "source": "https://www.data.jma.go.jp/suishin/shiyou/pdf/no40202",
+    "sourceVersion": "2023-02-01 index; code-manual content March 2020",
+    "pdfPage": 43,
+    "sha256": "b6b19f98932e3b326afc41d731b85a9af8f7e1c423413926e02c032aa22bc651",
+    "note": "Extracted code block (and appended text for 38); PDF layout whitespace normalized; no network envelope."
+  },
+  {
+    "path": "manual-39.telegram",
+    "kind": "Official Telegram",
+    "source": "https://www.data.jma.go.jp/suishin/shiyou/pdf/no40202",
+    "sourceVersion": "2023-02-01 index; code-manual content March 2020",
+    "pdfPage": 23,
+    "sha256": "9d4e17ee4e87b04d02ff2a6134ea6942aacb1d129125e523b3ba50eeb0519224",
+    "note": "Extracted code block (and appended text for 38); PDF layout whitespace normalized; no network envelope."
+  },
+  {
+    "path": "manual-47.telegram",
+    "kind": "Official Telegram",
+    "source": "https://www.data.jma.go.jp/suishin/shiyou/pdf/no40202",
+    "sourceVersion": "2023-02-01 index; code-manual content March 2020",
+    "pdfPage": 37,
+    "sha256": "032668b508536fb0e1e2627f7d0bc81274756d6b80622e32f87f1e9c798450af",
+    "note": "Extracted code block (and appended text for 38); PDF layout whitespace normalized; no network envelope."
+  },
+  {
+    "path": "manual-48.telegram",
+    "kind": "Official Telegram",
+    "source": "https://www.data.jma.go.jp/suishin/shiyou/pdf/no40202",
+    "sourceVersion": "2023-02-01 index; code-manual content March 2020",
+    "pdfPage": 39,
+    "sha256": "4c6d3ce29ed435f4130177daae44ad291f13f409bf154ba8bc213436f61362b8",
+    "note": "Extracted code block (and appended text for 38); PDF layout whitespace normalized; no network envelope."
+  },
+  {
+    "path": "manual-61.telegram",
+    "kind": "Official Telegram",
+    "source": "https://www.data.jma.go.jp/suishin/shiyou/pdf/no40202",
+    "sourceVersion": "2023-02-01 index; code-manual content March 2020",
+    "pdfPage": 44,
+    "sha256": "2080fb0ae61b8726727050e670679c58d46224f84a2a4cef1bdb70b38bad7b02",
+    "note": "Extracted code block (and appended text for 38); PDF layout whitespace normalized; no network envelope."
+  }
+]

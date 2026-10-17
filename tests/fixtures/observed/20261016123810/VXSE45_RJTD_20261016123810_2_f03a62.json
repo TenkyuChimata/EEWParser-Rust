@@ -1,0 +1,111 @@
+{
+  "_originalId": "f03a62bd13895056214ccae8fbee216e16bbeb5ec2ac6bbedc15029bd925309db934696ad7553b1beb3d3cb62778384c",
+  "_schema": {
+    "type": "eew-information",
+    "version": "1.0.0"
+  },
+  "body": {
+    "earthquake": {
+      "arrivalTime": "2026-10-16T12:38:10+09:00",
+      "hypocenter": {
+        "accuracy": {
+          "depth": "4",
+          "epicenters": [
+            "4",
+            "4"
+          ],
+          "magnitudeCalculation": "3",
+          "numberOfMagnitudeCalculation": "1"
+        },
+        "code": "187",
+        "coordinate": {
+          "height": {
+            "type": "高さ",
+            "unit": "m",
+            "value": "-10000"
+          },
+          "latitude": {
+            "text": "44.6˚N",
+            "value": "44.6000"
+          },
+          "longitude": {
+            "text": "147.6˚E",
+            "value": "147.6000"
+          }
+        },
+        "depth": {
+          "type": "深さ",
+          "unit": "km",
+          "value": "10"
+        },
+        "landOrSea": "海域",
+        "name": "択捉島付近",
+        "reduce": {
+          "code": "9706",
+          "name": "択捉島付近"
+        }
+      },
+      "magnitude": {
+        "type": "マグニチュード",
+        "unit": "Mj",
+        "value": "6.7"
+      },
+      "originTime": "2026-10-16T12:37:38+09:00"
+    },
+    "intensity": {
+      "appendix": {
+        "maxIntChange": "0",
+        "maxIntChangeReason": "0",
+        "maxLgIntChange": "0"
+      },
+      "forecastMaxInt": {
+        "from": "4",
+        "to": "4"
+      },
+      "forecastMaxLgInt": {
+        "from": "0",
+        "to": "0"
+      },
+      "regions": [
+        {
+          "arrivalTime": "2026-10-16T12:38:31+09:00",
+          "code": "165",
+          "forecastMaxInt": {
+            "from": "4",
+            "to": "4"
+          },
+          "forecastMaxLgInt": {
+            "from": "0",
+            "to": "0"
+          },
+          "isPlum": false,
+          "isWarning": false,
+          "kind": {
+            "code": "00",
+            "name": "緊急地震速報（予報）"
+          },
+          "name": "根室地方北部"
+        }
+      ]
+    },
+    "isCanceled": false,
+    "isLastInfo": false,
+    "isWarning": false
+  },
+  "editorialOffice": "気象庁本庁",
+  "eventId": "20261016123810",
+  "headline": null,
+  "infoKind": "緊急地震速報",
+  "infoKindVersion": "1.2_0",
+  "infoType": "発表",
+  "pressDateTime": "2026-10-16T03:38:28Z",
+  "publishingOffice": [
+    "気象庁"
+  ],
+  "reportDateTime": "2026-10-16T12:38:28+09:00",
+  "serialNo": "2",
+  "status": "通常",
+  "targetDateTime": "2026-10-16T12:38:28+09:00",
+  "title": "緊急地震速報（地震動予報）",
+  "type": "緊急地震速報（地震動予報）"
+}

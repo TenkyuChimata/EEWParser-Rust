@@ -1,0 +1,303 @@
+[
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_1_79e320.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "e8d583e79a0228227ba476a7eafd3dcf749d7d1e907063317ecc7db54f42f56a",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/01-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_2_f03a62.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "0ecf5677d9998ee895c9004747bd7926418d4faee6b00ecadfcd5353cab095b2",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/02-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_3_5137ef.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "5971dab036c6d33cfb3a17fa0bbba24ad7d9a01b290a5d0e87aa0c0ba8d14c1a",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/03-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_4_d4fdcf.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "0a3957891b3ec9bd2c59198f4b89f1d576a047b615feef5a2883c3b7e5573969",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/04-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_5_cbf854.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "82dd1c86078d6dfa549225acca26abcb2b074da68cdc461945cb969a88cdf6b1",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/05-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_6_40b46a.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "18ea8576e5582ccacbbe8245454154a4bdbfa628b7c0f5871c8209610a9be0df",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/06-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_7_312a8e.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "f160e5c141ebd7d1835bcd9fec7a1098caf7c93680e61d8ebdcf23ff72f44d4a",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/07-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_8_156cca.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "766b3872bba465f3e8d3a29d06ce5497f60f3f318d3cb9c0739086e42ec4925e",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/08-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_9_6a5cbb.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "19cbba2ef7f1ad6c4c18325c39f415d11c8935197297b7bf3a759cf32b85e58f",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/09-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_10_db2aab.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "3cc699e6cd56c8a7b302e2ef85f9b8051ba2f03dd0e6dd4bd709a28eb533de26",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/10-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_11_92b0c8.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "554341d1dd2e857d60537ccf1db72a824d4ba1df7b54d9a7d8dea0db6652df35",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/11-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_12_692fb1.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "96e9273a07369eb6a473ab2aa5836f8d7b7d8872cd18d733b624b158278dc60a",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/12-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_13_bdb601.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "d87a860c5e2b359ea77900cb06077d9d5db7e46620a8cf4d4d2ebca61a8cb497",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/13-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_14_7bfb49.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "c6f36c5c26d423948d92c55fd2675fe20b085ff0e26089e290834595262af683",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/14-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_15_7e0286.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "17af2e03928a23d9836e3355d36bc0c77672a4dc26f5a0edf5905ab440c1a257",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/15-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_16_8db3d9.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "18fc13d18f62be564291324cc9833f59f86ccf02ab3c480f713edb50fa7d6af9",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/16-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_17_752c2a.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "99d73d9a3cefca9e9bd31d793f115d5128a25fb6aa1e12fc0ab1617df2c6d6df",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/17-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_18_f008ff.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "77047da322c1fafd800db4037bf2a1953e6e7fcae8024734bd0f9a52d98a8c98",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/18-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_19_70b81e.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "288d682da1b82714f3aa96198310311006009278d523a2b187c856d49a90ce1e",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/19-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_20_751151.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "9d1ba672b692ddc18e213a1d157bf07143270412355a7e758267d46bcba56635",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/20-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_21_ad35d2.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "9c40f1fb2cbb333ee6a8550cb016799c76aba67780cc41c98086d87275ee0bae",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/21-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_22_395042.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "5b25dbd989eeec11be6038bdd6668269cd5015ce73e94f9a6252ed9cf4120de3",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/22-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_23_b060a9.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "e04341b55e10af3de98182d8c34a1c6f7696b3ffac87895077f1f21624aa796b",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/23-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_24_9cbce6.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "94a6b321adc5b5f539b6deef7fa50a91af8b15ff421d9428606792c9aa907811",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/24-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_25_c55ae8.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "6478da973eac52b1b01f6d560d55a94832c45f625b82be57a822ff15693fb537",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/25-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_26_4893ac.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "8a404154e8e5330b5332469bfcc25bd3ca6775cebf2390aac41bd155ddcf8be1",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/26-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_27_273c55.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "f948be7b4de730a6b8b161667a570a2205ce67fb05dc779c16585126c2a4c39e",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/27-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_28_b52ae9.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "9d0852f088bda58c0b583d2bf46289fdc8513f707e04f848820e13d77e575757",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/28-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_29_390ea3.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "b750e06ad20b6982b1312a329fcbc61e19124eebac047101ea82375e5f541867",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/29-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_30_f295b1.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "209171ded5ef14a23fbfcc1b82daaac0afda8bee10df0fac5cd410448070382e",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/30-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_31_085e8e.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "744e6ccabc94180f4b06db67b63d80d049edc5fba6e80abe599350ee4d0378bf",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/31-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_32_ad864d.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "52147cc5e8e969b12973eea55f4db33e6d9236cc7c74a3732abea3331305d9d4",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/32-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_33_fb85d6.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "f79700d7d22a7a18332a60d07c98bfd4d88fec7120b260adf66da6bd0293cee8",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/33-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_34_3bb722.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "fcef0ca47309efa287b7e63a42f73f1939b5df8a4623b3be4a5469d4b40bc9b6",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/34-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_35_c337c7.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "c58f0911636b82f6e04aa693a636646f4445b4f18694b3a1ec889bad48f7b8d6",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/35-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_36_c4e8e0.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "3692b512381db4818b823a056fbcf69f6838a79957399a18f62ea37e2d3695a2",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/36-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_37_5b4a9e.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "4914c687de0b8d4d487599242a99ff475689c9409b22347dc116201f3ceb9618",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/37-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_38_14e02d.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "a175582004d908eb7d84577e7a320658f246eedb704f5ca5ee47593dc1a56f21",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/38-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_39_08de8c.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "dfbfb21d30eeaf81b5c5ec21dd7b1fc94572fcfa28424a9c94051daf45c99466",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/39-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_40_079a88.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "b8ff1caa36615431882a565b0a6f1bade6c798b9205a6376aba875be195eb982",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/40-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_41_7f9496.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "6ee8cf5eab5c457a59f8c7d60adeab130deb776528632f37e696ec6a287b87fb",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/41-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_42_de2da1.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "9027c51d3f274f95d733ba16b55cbf27105902a36026e8fc07e81a98503966e5",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/42-report.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  },
+  {
+    "path": "tests/fixtures/observed/20261016123810/VXSE45_RJTD_20261016123810_37_Canceled_369665.json",
+    "kind": "Observed DMDATA JSON",
+    "sha256": "935b1acb33f1e212df696c18420ac3318f25fe74c6fdde4bcfd25849246cf9ce",
+    "syntheticXml": "tests/fixtures/synthetic/20261016123810/37-cancel.xml",
+    "syntheticKind": "Synthetic; derived from converted JSON; NOT original JMA XML"
+  }
+]

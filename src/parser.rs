@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::error::AppError;
+use crate::model::TelegramCodes;
 
 // Telegram main struct
 #[allow(non_snake_case)]
@@ -17,10 +18,10 @@ pub struct Telegram {
     pub WarnCode: String,
     pub WarnNum: String,
     pub Shinou: String,
-    pub ShinouLat: f64,
-    pub ShinouLng: f64,
-    pub ShinouDpth: i64,
-    pub Magnitude: f64,
+    pub ShinouLat: Option<f64>,
+    pub ShinouLng: Option<f64>,
+    pub ShinouDpth: Option<i64>,
+    pub Magnitude: Option<f64>,
     pub Shindo: String,
     pub Rk1: String,
     pub Rk2: String,
@@ -34,6 +35,14 @@ pub struct Telegram {
     pub Rc2: String,
     pub Ebis: Vec<Ebi>,
     pub Telegram: String,
+    #[serde(default)]
+    pub raw_codes: TelegramCodes,
+    #[serde(default)]
+    pub reduced_epicenter: Option<String>,
+    #[serde(default)]
+    pub eip: Vec<(String, String)>,
+    #[serde(default)]
+    pub text: Option<String>,
 }
 
 // Ebi in Telegram 予想震度と到達時
@@ -58,7 +67,11 @@ pub fn decoder(s: &str, logical_telegram: String) -> Result<Telegram, AppError> 
         MsgType: msg_type(&from.MsgType).to_string(),
         WarnTime: format!("20{}", from.WarnTime),
         CommandCode: from.CommandCode.clone(),
-        EqTime: format!("20{}", from.EqTime),
+        EqTime: if from.EqTime.is_empty() {
+            String::new()
+        } else {
+            format!("20{}", from.EqTime)
+        },
         EqID: from.EqID.clone(),
         WarnType: warn_type(&from.WarnType).to_string(),
         WarnCode: warn_code(&from.WarnCode).to_string(),
@@ -71,12 +84,18 @@ pub fn decoder(s: &str, logical_telegram: String) -> Result<Telegram, AppError> 
         Shindo: shindo(&from.Shindo).to_string(),
         Rk1: rk1(&from.Rk1).to_string(),
         Rk2: rk2(&from.Rk2).to_string(),
-        Rk3: rk3(&from.Rk3).to_string(),
+        Rk3: rk3(&from.Rk3, &from.WarnTime).to_string(),
         Rt1: rt1(&from.Rt1).to_string(),
         Rt2: rt2(&from.Rt2).to_string(),
         Rt3: rt3(&from.Rt3).to_string(),
         Rc1: rc1(&from.Rc1).to_string(),
         Rc2: rc2(&from.Rc2).to_string(),
+        Rk4: from.Rk4.clone(),
+        Rk5: from.Rk5.clone(),
+        raw_codes: from.raw_codes.clone(),
+        reduced_epicenter: from.reduced_epicenter.clone(),
+        eip: from.eip.clone(),
+        text: from.text.clone(),
         Telegram: logical_telegram,
         ..Telegram::default()
     };
@@ -125,12 +144,21 @@ impl Telegram {
     }
 
     pub fn is_final(&self) -> bool {
-        self.WarnCode == "最終"
+        !matches!(self.raw_codes.code_type.as_str(), "47" | "48" | "38")
+            && self
+                .raw_codes
+                .ncn
+                .as_deref()
+                .is_some_and(|n| n.starts_with(['8', '9']))
     }
 }
 
 pub fn reader(s: &str) -> Result<Telegram, AppError> {
-    let tokens: Vec<&str> = s.split_whitespace().collect();
+    const MAX_TOKENS: usize = 65_536;
+    let tokens: Vec<&str> = s.split_whitespace().take(MAX_TOKENS + 1).collect();
+    if tokens.len() > MAX_TOKENS {
+        return Err(invalid("Telegram exceeds 65536 tokens"));
+    }
     if tokens.len() < 6 {
         return Err(invalid("Telegram is too short"));
     }
@@ -168,6 +196,21 @@ pub fn reader(s: &str) -> Result<Telegram, AppError> {
         .ok_or_else(|| invalid("command code must start with C"))?
         .to_string();
 
+    if !matches!(
+        msg.MsgType.as_str(),
+        "00" | "01" | "10" | "11" | "20" | "30"
+    ) {
+        return Err(invalid("unsupported message type"));
+    }
+    if msg.CommandCode != "11" {
+        return Err(invalid(
+            "fragmented Telegram requires reassembly before decoding (expected C11)",
+        ));
+    }
+    msg.raw_codes.code_type.clone_from(&msg.CodeType);
+    msg.raw_codes.section.clone_from(&msg.Section);
+    msg.raw_codes.message_type.clone_from(&msg.MsgType);
+    msg.raw_codes.command.clone_from(&msg.CommandCode);
     match msg.CodeType.as_str() {
         "35" | "36" | "37" | "39" | "61" => {
             parse_forecast(&tokens, &mut index, &mut msg)?;
@@ -178,33 +221,50 @@ pub fn reader(s: &str) -> Result<Telegram, AppError> {
         _ => unreachable!(),
     }
 
-    if take(&tokens, &mut index, "Telegram terminator")? != "9999=" {
-        return Err(invalid("expected 9999= terminator"));
-    }
-    if index != tokens.len() {
-        return Err(invalid("unexpected data after 9999="));
+    let end = take(&tokens, &mut index, "Telegram terminator")?;
+    if end == "9999" && s.trim_end().ends_with('=') {
+        // Official code-38 tests terminate the code block with 9999, then
+        // append human-readable text before the Telegram's final '='.
+        let offset = end.as_ptr() as usize - s.as_ptr() as usize + end.len();
+        let text = s[offset..]
+            .trim()
+            .strip_suffix('=')
+            .unwrap_or_default()
+            .trim();
+        msg.text = (!text.is_empty()).then(|| text.to_owned());
+    } else if end != "9999=" || index != tokens.len() {
+        return Err(invalid(
+            "expected 9999=, or 9999 followed by text and terminal =",
+        ));
     }
 
     Ok(msg)
 }
 
 fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Result<(), AppError> {
-    msg.EqTime = fixed(
-        take(tokens, index, "earthquake time")?,
-        12,
-        "earthquake time",
-    )?
-    .to_string();
+    // NCP begins with ND, without repeating the earthquake time.
+    if msg.CodeType != "47" {
+        msg.EqTime = fixed(
+            take(tokens, index, "earthquake time")?,
+            12,
+            "earthquake time",
+        )?
+        .to_string();
+    }
     let nd = prefixed(take(tokens, index, "ND")?, "ND", 14)?;
     msg.EqID = nd.to_string();
 
     let ncn = prefixed(take(tokens, index, "NCN")?, "NCN", 3)?;
     msg.WarnType = "NCN".to_string();
+    msg.raw_codes.ncn = Some(ncn.to_owned());
+    if !matches!(&ncn[0..1], "0" | "6" | "7" | "8" | "9" | "/") {
+        return Err(invalid("invalid NCN status"));
+    }
     msg.WarnCode = ncn[0..1].to_string();
     msg.WarnNum = ncn[1..3].to_string();
 
-    prefixed(take(tokens, index, "JD")?, "JD", 14)?;
-    prefixed(take(tokens, index, "JN")?, "JN", 3)?;
+    msg.raw_codes.jd = Some(prefixed(take(tokens, index, "JD")?, "JD", 14)?.to_owned());
+    msg.raw_codes.jn = Some(prefixed(take(tokens, index, "JN")?, "JN", 3)?.to_owned());
 
     msg.Shinou = fixed(take(tokens, index, "epicenter code")?, 3, "epicenter code")?.to_string();
     msg.ShinouLat = parse_coordinate(take(tokens, index, "latitude")?, 'N', 'S', 3)?;
@@ -219,6 +279,8 @@ fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Res
     .to_string();
 
     let rk = prefixed(take(tokens, index, "RK")?, "RK", 5)?;
+    msg.raw_codes.rk = Some(rk.to_owned());
+    validate_digits_or_slashes(rk, "RK")?;
     msg.Rk1 = rk[0..1].to_string();
     msg.Rk2 = rk[1..2].to_string();
     msg.Rk3 = rk[2..3].to_string();
@@ -226,11 +288,15 @@ fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Res
     msg.Rk5 = rk[4..5].to_string();
 
     let rt = prefixed(take(tokens, index, "RT")?, "RT", 5)?;
+    msg.raw_codes.rt = Some(rt.to_owned());
+    validate_digits_or_slashes(rt, "RT")?;
     msg.Rt1 = rt[0..1].to_string();
     msg.Rt2 = rt[1..2].to_string();
     msg.Rt3 = rt[2..3].to_string();
 
     let rc = prefixed(take(tokens, index, "RC")?, "RC", 5)?;
+    msg.raw_codes.rc = Some(rc.to_owned());
+    validate_digits_or_slashes(rc, "RC")?;
     msg.Rc1 = rc[0..1].to_string();
     msg.Rc2 = rc[1..2].to_string();
 
@@ -244,15 +310,16 @@ fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Res
         Some("EIP") => {
             *index += 1;
             while tokens.get(*index).copied() != Some("9999=") {
-                fixed(
-                    take(tokens, index, "EIP station code")?,
-                    7,
-                    "EIP station code",
-                )?;
-                let value = take(tokens, index, "EIP intensity")?;
-                if value.len() != 3 || !value.starts_with('P') {
-                    return Err(invalid("invalid EIP intensity"));
+                let code = take(tokens, index, "EIP station code")?;
+                if !(7..=8).contains(&code.len())
+                    || !code.bytes().all(|b| b.is_ascii_alphanumeric())
+                {
+                    return Err(invalid(
+                        "EIP station code must be 7 ASCII alphanumeric bytes (8 in the official legacy example)",
+                    ));
                 }
+                let value = prefixed(take(tokens, index, "EIP intensity")?, "P", 2)?;
+                msg.eip.push((code.to_owned(), value.to_owned()));
             }
         }
         _ => {}
@@ -276,18 +343,22 @@ fn parse_warning(
     msg.EqID = prefixed(take(tokens, index, "ND")?, "ND", 14)?.to_string();
     let ncpn = prefixed(take(tokens, index, "NCPN")?, "NCPN", 2)?;
     let warning_number = ncpn.to_string();
+    msg.raw_codes.ncpn = Some(ncpn.to_owned());
     msg.WarnType = "NCPN".to_string();
     msg.WarnNum.clone_from(&warning_number);
 
-    fixed(
-        take(tokens, index, "reduced epicenter code")?,
-        4,
-        "reduced epicenter code",
-    )?;
+    msg.reduced_epicenter = Some(
+        fixed(
+            take(tokens, index, "reduced epicenter code")?,
+            4,
+            "reduced epicenter code",
+        )?
+        .to_owned(),
+    );
     msg.ShinouLat = parse_coordinate(take(tokens, index, "latitude")?, 'N', 'S', 3)?;
     msg.ShinouLng = parse_coordinate(take(tokens, index, "longitude")?, 'E', 'W', 4)?;
     msg.ShinouDpth = parse_unknown_i64(take(tokens, index, "depth")?, 3, "depth")?;
-    prefixed(take(tokens, index, "PRC")?, "PRC", 5)?;
+    msg.raw_codes.prc = Some(prefixed(take(tokens, index, "PRC")?, "PRC", 5)?.to_owned());
 
     for (marker, next) in [
         ("CAI", "CPI"),
@@ -296,9 +367,17 @@ fn parse_warning(
         ("PAI", "PPI"),
         ("PPI", "PBI"),
     ] {
-        consume_list(tokens, index, marker, next)?;
+        let values = consume_list(tokens, index, marker, next)?;
+        match marker {
+            "CAI" => msg.raw_codes.cai = values,
+            "CPI" => msg.raw_codes.cpi = values,
+            "CBI" => msg.raw_codes.cbi = values,
+            "PAI" => msg.raw_codes.pai = values,
+            "PPI" => msg.raw_codes.ppi = values,
+            _ => unreachable!(),
+        }
     }
-    consume_list(
+    msg.raw_codes.pbi = consume_list(
         tokens,
         index,
         "PBI",
@@ -309,9 +388,18 @@ fn parse_warning(
         if take(tokens, index, "NCP")? != "NCP" {
             return Err(invalid("expected NCP before forecast block"));
         }
+        let outer_id = msg.EqID.clone();
         parse_forecast(tokens, index, msg)?;
+        if outer_id != msg.EqID {
+            return Err(invalid(
+                "outer warning and NCP have different ND identifiers",
+            ));
+        }
         // Nested NCP fields populate the forecast detail, but the JSON report
         // identity remains the top-level general warning and its NCPN serial.
+        if msg.raw_codes.ncpn.is_none() {
+            return Err(invalid("missing warning serial"));
+        }
         msg.WarnType = "NCPN".to_string();
         msg.WarnNum = warning_number;
     }
@@ -324,7 +412,7 @@ fn consume_list(
     index: &mut usize,
     marker: &str,
     next: &str,
-) -> Result<(), AppError> {
+) -> Result<Vec<String>, AppError> {
     if take(tokens, index, marker)? != marker {
         return Err(invalid(format!("expected {marker}")));
     }
@@ -338,7 +426,19 @@ fn consume_list(
     if *index == start {
         return Err(invalid(format!("empty {marker} list")));
     }
-    Ok(())
+    let width = if matches!(marker, "CBI" | "PBI") {
+        3
+    } else {
+        4
+    };
+    tokens[start..*index]
+        .iter()
+        .map(|t| {
+            fixed(t, width, marker)?;
+            validate_digits_or_slashes(t, marker)?;
+            Ok((*t).to_owned())
+        })
+        .collect()
 }
 
 fn parse_ebi(tokens: &[&str], index: &mut usize) -> Result<Ebi, AppError> {
@@ -389,10 +489,13 @@ fn parse_coordinate(
     positive: char,
     negative: char,
     digits: usize,
-) -> Result<f64, AppError> {
+) -> Result<Option<f64>, AppError> {
     fixed(token, digits + 1, "coordinate")?;
     if token[1..].chars().all(|character| character == '/') {
-        return Ok(0.0);
+        if token.starts_with([positive, negative, '/']) {
+            return Ok(None);
+        }
+        return Err(invalid("invalid unknown coordinate hemisphere"));
     }
     let sign = match token.as_bytes()[0] as char {
         value if value == positive => 1.0,
@@ -402,28 +505,42 @@ fn parse_coordinate(
     let value = token[1..]
         .parse::<u32>()
         .map_err(|_| invalid("invalid coordinate digits"))?;
-    Ok(sign * f64::from(value) / 10.0)
+    let value = sign * f64::from(value) / 10.0;
+    if value.abs() > if positive == 'N' { 90.0 } else { 180.0 } {
+        return Err(invalid("coordinate out of range"));
+    }
+    Ok(Some(value))
 }
 
-fn parse_unknown_i64(token: &str, length: usize, field: &str) -> Result<i64, AppError> {
+fn parse_unknown_i64(token: &str, length: usize, field: &str) -> Result<Option<i64>, AppError> {
     fixed(token, length, field)?;
     if token.chars().all(|c| c == '/') {
-        return Ok(0);
+        return Ok(None);
     }
+    validate_digits_or_slashes(token, field)?;
     token
         .parse()
+        .map(Some)
         .map_err(|_| invalid(format!("invalid {field}")))
 }
 
-fn parse_unknown_decimal(token: &str, length: usize, field: &str) -> Result<f64, AppError> {
+fn parse_unknown_decimal(token: &str, length: usize, field: &str) -> Result<Option<f64>, AppError> {
     fixed(token, length, field)?;
     if token.chars().all(|c| c == '/') {
-        return Ok(0.0);
+        return Ok(None);
     }
     token
         .parse::<u32>()
-        .map(|value| f64::from(value) / 10.0)
+        .map(|value| Some(f64::from(value) / 10.0))
         .map_err(|_| invalid(format!("invalid {field}")))
+}
+
+fn validate_digits_or_slashes(token: &str, field: &str) -> Result<(), AppError> {
+    if token.bytes().all(|b| b.is_ascii_digit() || b == b'/') {
+        Ok(())
+    } else {
+        Err(invalid(format!("invalid {field}")))
+    }
 }
 
 fn invalid(message: impl Into<String>) -> AppError {
@@ -523,10 +640,11 @@ fn rk2(code: &str) -> &'static str {
 }
 
 // Rk3 マグニチュードの確からしさ
-fn rk3(code: &str) -> &'static str {
+fn rk3(code: &str, sent_at: &str) -> &'static str {
     match code {
         "1" => "未定義",
-        "2" => "防災科研システム",
+        "2" if sent_at >= "230926140000" => "速度マグニチュード",
+        "2" => "防災科研システム（Hi-netデータ）",
         "3" => "全点P 相",
         "4" => "P 相／全相混在",
         "5" => "全点全相",
@@ -691,7 +809,7 @@ fn warn_code(code: &str) -> &'static str {
         "0" => "通常",
         "6" => "訂正",
         "7" => "訂正(キャンセル誤発表)",
-        "8" => "訂正(予報)",
+        "8" => "訂正を含む最終",
         "9" => "最終",
         "/" => "不明、未設定時",
         _ => "",
@@ -699,547 +817,11 @@ fn warn_code(code: &str) -> &'static str {
 }
 
 fn shinou_code(code: &str) -> &'static str {
-    match code {
-        "000" => "",
-        "011" => "北海道地方",
-        "012" => "東北地方",
-        "013" => "北陸地方",
-        "014" => "関東甲信地方",
-        "015" => "小笠原地方",
-        "016" => "東海地方",
-        "017" => "近畿地方",
-        "018" => "中国地方",
-        "019" => "四国地方",
-        "020" => "九州地方",
-        "021" => "沖縄地方",
-        "100" => "石狩地方北部",
-        "101" => "石狩地方中部",
-        "102" => "石狩地方南部",
-        "105" => "渡島地方北部",
-        "106" => "渡島地方東部",
-        "107" => "渡島地方西部",
-        "110" => "檜山地方",
-        "115" => "後志地方北部",
-        "116" => "後志地方東部",
-        "117" => "後志地方西部",
-        "120" => "空知地方北部",
-        "121" => "空知地方中部",
-        "122" => "空知地方南部",
-        "125" => "上川地方北部",
-        "126" => "上川地方中部",
-        "127" => "上川地方南部",
-        "130" => "留萌地方中北部",
-        "131" => "留萌地方南部",
-        "135" => "宗谷地方北部",
-        "136" => "宗谷地方南部",
-        "140" => "網走地方",
-        "141" => "北見地方",
-        "142" => "紋別地方",
-        "145" => "胆振地方西部",
-        "146" => "胆振地方中東部",
-        "150" => "日高地方西部",
-        "151" => "日高地方中部",
-        "152" => "日高地方東部",
-        "155" => "十勝地方北部",
-        "156" => "十勝地方中部",
-        "157" => "十勝地方南部",
-        "160" => "釧路地方北部",
-        "161" => "釧路地方中南部",
-        "165" => "根室地方北部",
-        "166" => "根室地方中部",
-        "167" => "根室地方南部",
-        "180" => "北海道南西沖",
-        "181" => "北海道西方沖",
-        "182" => "石狩湾",
-        "183" => "北海道北西沖",
-        "184" => "宗谷海峡",
-        "186" => "国後島付近",
-        "187" => "択捉島付近",
-        "188" => "北海道東方沖",
-        "189" => "根室半島南東沖",
-        "190" => "釧路沖",
-        "191" => "十勝沖",
-        "192" => "浦河沖",
-        "193" => "苫小牧沖",
-        "194" => "内浦湾",
-        "195" => "宗谷東方沖",
-        "196" => "網走沖",
-        "197" => "択捉島南東沖",
-        "200" => "青森県津軽北部",
-        "201" => "青森県津軽南部",
-        "202" => "青森県三八上北地方",
-        "203" => "青森県下北地方",
-        "210" => "岩手県沿岸北部",
-        "211" => "岩手県沿岸南部",
-        "212" => "岩手県内陸北部",
-        "213" => "岩手県内陸南部",
-        "220" => "宮城県北部",
-        "221" => "宮城県南部",
-        "222" => "宮城県中部",
-        "230" => "秋田県沿岸北部",
-        "231" => "秋田県沿岸南部",
-        "232" => "秋田県内陸北部",
-        "233" => "秋田県内陸南部",
-        "240" => "山形県庄内地方",
-        "241" => "山形県最上地方",
-        "242" => "山形県村山地方",
-        "243" => "山形県置賜地方",
-        "250" => "福島県中通り",
-        "251" => "福島県浜通り",
-        "252" => "福島県会津",
-        "280" => "津軽海峡",
-        "281" => "山形県沖",
-        "282" => "秋田県沖",
-        "283" => "青森県西方沖",
-        "284" => "陸奥湾",
-        "285" => "青森県東方沖",
-        "286" => "岩手県沖",
-        "287" => "宮城県沖",
-        "288" => "三陸沖",
-        "289" => "福島県沖",
-        "300" => "茨城県北部",
-        "301" => "茨城県南部",
-        "309" => "千葉県南東沖",
-        "310" => "栃木県北部",
-        "311" => "栃木県南部",
-        "320" => "群馬県北部",
-        "321" => "群馬県南部",
-        "330" => "埼玉県北部",
-        "331" => "埼玉県南部",
-        "332" => "埼玉県秩父地方",
-        "340" => "千葉県北東部",
-        "341" => "千葉県北西部",
-        "342" => "千葉県南部",
-        "349" => "房総半島南方沖",
-        "350" => "東京都２３区",
-        "351" => "東京都多摩東部",
-        "352" => "東京都多摩西部",
-        "360" => "神奈川県東部",
-        "361" => "神奈川県西部",
-        "370" => "新潟県上越地方",
-        "371" => "新潟県中越地方",
-        "372" => "新潟県下越地方",
-        "378" => "新潟県下越沖",
-        "379" => "新潟県上中越沖",
-        "380" => "富山県東部",
-        "381" => "富山県西部",
-        "390" => "石川県能登地方",
-        "391" => "石川県加賀地方",
-        "400" => "福井県嶺北",
-        "401" => "福井県嶺南",
-        "411" => "山梨県中・西部",
-        "412" => "山梨県東部・富士五湖",
-        "420" => "長野県北部",
-        "421" => "長野県中部",
-        "422" => "長野県南部",
-        "430" => "岐阜県飛騨地方",
-        "431" => "岐阜県美濃東部",
-        "432" => "岐阜県美濃中西部",
-        "440" => "静岡県伊豆地方",
-        "441" => "静岡県東部",
-        "442" => "静岡県中部",
-        "443" => "静岡県西部",
-        "450" => "愛知県東部",
-        "451" => "愛知県西部",
-        "460" => "三重県北部",
-        "461" => "三重県中部",
-        "462" => "三重県南部",
-        "469" => "三重県南東沖",
-        "471" => "茨城県沖",
-        "472" => "関東東方沖",
-        "473" => "千葉県東方沖",
-        "475" => "八丈島東方沖",
-        "476" => "八丈島近海",
-        "477" => "東京湾",
-        "478" => "相模湾",
-        "480" => "伊豆大島近海",
-        "481" => "伊豆半島東方沖",
-        "482" => "三宅島近海",
-        "483" => "新島・神津島近海",
-        "485" => "駿河湾",
-        "486" => "駿河湾南方沖",
-        "487" => "遠州灘",
-        "489" => "三河湾",
-        "490" => "伊勢湾",
-        "492" => "若狭湾",
-        "493" => "福井県沖",
-        "494" => "石川県西方沖",
-        "495" => "能登半島沖",
-        "497" => "富山湾",
-        "498" => "佐渡付近",
-        "499" => "東海道南方沖",
-        "500" => "滋賀県北部",
-        "501" => "滋賀県南部",
-        "510" => "京都府北部",
-        "511" => "京都府南部",
-        "520" => "大阪府北部",
-        "521" => "大阪府南部",
-        "530" => "兵庫県北部",
-        "531" => "兵庫県南東部",
-        "532" => "兵庫県南西部",
-        "540" => "奈良県",
-        "550" => "和歌山県北部",
-        "551" => "和歌山県南部",
-        "560" => "鳥取県東部",
-        "562" => "鳥取県中部",
-        "563" => "鳥取県西部",
-        "570" => "島根県東部",
-        "571" => "島根県西部",
-        "580" => "岡山県北部",
-        "581" => "岡山県南部",
-        "590" => "広島県北部",
-        "591" => "広島県南東部",
-        "592" => "広島県南西部",
-        "600" => "徳島県北部",
-        "601" => "徳島県南部",
-        "610" => "香川県東部",
-        "611" => "香川県西部",
-        "620" => "愛媛県東予",
-        "621" => "愛媛県中予",
-        "622" => "愛媛県南予",
-        "630" => "高知県東部",
-        "631" => "高知県中部",
-        "632" => "高知県西部",
-        "673" => "土佐湾",
-        "674" => "紀伊水道",
-        "675" => "大阪湾",
-        "676" => "播磨灘",
-        "677" => "瀬戸内海中部",
-        "678" => "安芸灘",
-        "679" => "周防灘",
-        "680" => "伊予灘",
-        "681" => "豊後水道",
-        "682" => "山口県北西沖",
-        "683" => "島根県沖",
-        "684" => "鳥取県沖",
-        "685" => "隠岐島近海",
-        "686" => "兵庫県北方沖",
-        "687" => "京都府沖",
-        "688" => "淡路島付近",
-        "689" => "和歌山県南方沖",
-        "700" => "山口県北部",
-        "702" => "山口県西部",
-        "703" => "山口県東部",
-        "704" => "山口県中部",
-        "710" => "福岡県福岡地方",
-        "711" => "福岡県北九州地方",
-        "712" => "福岡県筑豊地方",
-        "713" => "福岡県筑後地方",
-        "720" => "佐賀県北部",
-        "721" => "佐賀県南部",
-        "730" => "長崎県北部",
-        "731" => "長崎県南西部",
-        "732" => "長崎県島原半島",
-        "740" => "熊本県阿蘇地方",
-        "741" => "熊本県熊本地方",
-        "742" => "熊本県球磨地方",
-        "743" => "熊本県天草・芦北地方",
-        "750" => "大分県北部",
-        "751" => "大分県中部",
-        "752" => "大分県南部",
-        "753" => "大分県西部",
-        "760" => "宮崎県北部平野部",
-        "761" => "宮崎県北部山沿い",
-        "762" => "宮崎県南部平野部",
-        "763" => "宮崎県南部山沿い",
-        "770" => "鹿児島県薩摩地方",
-        "771" => "鹿児島県大隅地方",
-        "783" => "五島列島近海",
-        "784" => "天草灘",
-        "785" => "有明海",
-        "786" => "橘湾",
-        "787" => "鹿児島湾",
-        "790" => "種子島近海",
-        "791" => "日向灘",
-        "793" => "奄美大島近海",
-        "795" => "壱岐・対馬近海",
-        "796" => "福岡県北西沖",
-        "797" => "薩摩半島西方沖",
-        "798" => "トカラ列島近海",
-        "799" => "奄美大島北西沖",
-        "820" => "大隅半島東方沖",
-        "821" => "九州地方南東沖",
-        "822" => "種子島南東沖",
-        "823" => "奄美大島北東沖",
-        "850" => "沖縄本島近海",
-        "851" => "南大東島近海",
-        "852" => "沖縄本島南方沖",
-        "853" => "宮古島近海",
-        "854" => "石垣島近海",
-        "855" => "石垣島南方沖",
-        "856" => "西表島付近",
-        "857" => "与那国島近海",
-        "858" => "沖縄本島北西沖",
-        "859" => "宮古島北西沖",
-        "860" => "石垣島北西沖",
-        "900" => "台湾付近",
-        "901" => "東シナ海",
-        "902" => "四国沖",
-        "903" => "鳥島近海",
-        "904" => "鳥島東方沖",
-        "905" => "オホーツク海南部",
-        "906" => "サハリン西方沖",
-        "907" => "日本海北部",
-        "908" => "日本海中部",
-        "909" => "日本海西部",
-        "911" => "父島近海",
-        "912" => "千島列島",
-        "913" => "千島列島南東沖",
-        "914" => "北海道南東沖",
-        "915" => "東北地方東方沖",
-        "916" => "小笠原諸島西方沖",
-        "917" => "硫黄島近海",
-        "918" => "小笠原諸島東方沖",
-        "919" => "南海道南方沖",
-        "920" => "薩南諸島東方沖",
-        "921" => "本州南方沖",
-        "922" => "サハリン南部付近",
-        "930" => "北西太平洋",
-        "932" => "マリアナ諸島",
-        "933" => "黄海",
-        "934" => "朝鮮半島南部",
-        "935" => "朝鮮半島北部",
-        "936" => "中国東北部",
-        "937" => "ウラジオストク付近",
-        "938" => "シベリア南部",
-        "939" => "サハリン近海",
-        "940" => "アリューシャン列島",
-        "941" => "カムチャツカ半島付近",
-        "942" => "北米西部",
-        "943" => "北米中部",
-        "944" => "北米東部",
-        "945" => "中米",
-        "946" => "南米西部",
-        "947" => "南米中部",
-        "948" => "南米東部",
-        "949" => "北東太平洋",
-        "950" => "南太平洋",
-        "951" => "インドシナ半島付近",
-        "952" => "フィリピン付近",
-        "953" => "インドネシア付近",
-        "954" => "グアム付近",
-        "955" => "ニューギニア付近",
-        "956" => "ニュージーランド付近",
-        "957" => "オーストラリア付近",
-        "958" => "シベリア付近",
-        "959" => "ロシア西部",
-        "960" => "ロシア中部",
-        "961" => "ロシア東部",
-        "962" => "中央アジア",
-        "963" => "中国西部",
-        "964" => "中国中部",
-        "965" => "中国東部",
-        "966" => "インド付近",
-        "967" => "インド洋",
-        "968" => "中東",
-        "969" => "ヨーロッパ西部",
-        "970" => "ヨーロッパ中部",
-        "971" => "ヨーロッパ東部",
-        "972" => "地中海",
-        "973" => "アフリカ西部",
-        "974" => "アフリカ中部",
-        "975" => "アフリカ東部",
-        "976" => "北大西洋",
-        "977" => "南大西洋",
-        "978" => "北極付近",
-        "979" => "南極付近",
-        "999" => "遠地",
-        _ => "",
-    }
+    crate::codes::epicenter(code).unwrap_or("")
 }
 
 fn chiiki_code(code: &str) -> &'static str {
-    match code {
-        "100" => "石狩地方北部",
-        "101" => "石狩地方中部",
-        "102" => "石狩地方南部",
-        "105" => "渡島地方北部",
-        "106" => "渡島地方東部",
-        "107" => "渡島地方西部",
-        "110" => "檜山地方",
-        "115" => "後志地方北部",
-        "116" => "後志地方東部",
-        "117" => "後志地方西部",
-        "119" => "北海道奥尻島",
-        "120" => "空知地方北部",
-        "121" => "空知地方中部",
-        "122" => "空知地方南部",
-        "125" => "上川地方北部",
-        "126" => "上川地方中部",
-        "127" => "上川地方南部",
-        "130" => "留萌地方中北部",
-        "131" => "留萌地方南部",
-        "135" => "宗谷地方北部",
-        "136" => "宗谷地方南部",
-        "139" => "北海道利尻礼文",
-        "140" => "網走地方",
-        "141" => "北見地方",
-        "142" => "紋別地方",
-        "145" => "胆振地方西部",
-        "146" => "胆振地方中東部",
-        "150" => "日高地方西部",
-        "151" => "日高地方中部",
-        "152" => "日高地方東部",
-        "155" => "十勝地方北部",
-        "156" => "十勝地方中部",
-        "157" => "十勝地方南部",
-        "160" => "釧路地方北部",
-        "161" => "釧路地方中南部",
-        "165" => "根室地方北部",
-        "166" => "根室地方中部",
-        "167" => "根室地方南部",
-        "200" => "青森県津軽北部",
-        "201" => "青森県津軽南部",
-        "202" => "青森県三八上北",
-        "203" => "青森県下北",
-        "210" => "岩手県沿岸北部",
-        "211" => "岩手県沿岸南部",
-        "212" => "岩手県内陸北部",
-        "213" => "岩手県内陸南部",
-        "220" => "宮城県北部",
-        "221" => "宮城県南部",
-        "222" => "宮城県中部",
-        "230" => "秋田県沿岸北部",
-        "231" => "秋田県沿岸南部",
-        "232" => "秋田県内陸北部",
-        "233" => "秋田県内陸南部",
-        "240" => "山形県庄内",
-        "241" => "山形県最上",
-        "242" => "山形県村山",
-        "243" => "山形県置賜",
-        "250" => "福島県中通り",
-        "251" => "福島県浜通り",
-        "252" => "福島県会津",
-        "300" => "茨城県北部",
-        "301" => "茨城県南部",
-        "310" => "栃木県北部",
-        "311" => "栃木県南部",
-        "320" => "群馬県北部",
-        "321" => "群馬県南部",
-        "330" => "埼玉県北部",
-        "331" => "埼玉県南部",
-        "332" => "埼玉県秩父",
-        "340" => "千葉県北東部",
-        "341" => "千葉県北西部",
-        "342" => "千葉県南部",
-        "350" => "東京都２３区",
-        "351" => "東京都多摩東部",
-        "352" => "東京都多摩西部",
-        "354" => "神津島",
-        "355" => "伊豆大島",
-        "356" => "新島",
-        "357" => "三宅島",
-        "358" => "八丈島",
-        "359" => "小笠原",
-        "360" => "神奈川県東部",
-        "361" => "神奈川県西部",
-        "370" => "新潟県上越",
-        "371" => "新潟県中越",
-        "372" => "新潟県下越",
-        "375" => "新潟県佐渡",
-        "380" => "富山県東部",
-        "381" => "富山県西部",
-        "390" => "石川県能登",
-        "391" => "石川県加賀",
-        "400" => "福井県嶺北",
-        "401" => "福井県嶺南",
-        "411" => "山梨県中・西部",
-        "412" => "山梨県東部・富士五湖",
-        "420" => "長野県北部",
-        "421" => "長野県中部",
-        "422" => "長野県南部",
-        "430" => "岐阜県飛騨",
-        "431" => "岐阜県美濃東部",
-        "432" => "岐阜県美濃中西部",
-        "440" => "静岡県伊豆",
-        "441" => "静岡県東部",
-        "442" => "静岡県中部",
-        "443" => "静岡県西部",
-        "450" => "愛知県東部",
-        "451" => "愛知県西部",
-        "460" => "三重県北部",
-        "461" => "三重県中部",
-        "462" => "三重県南部",
-        "500" => "滋賀県北部",
-        "501" => "滋賀県南部",
-        "510" => "京都府北部",
-        "511" => "京都府南部",
-        "520" => "大阪府北部",
-        "521" => "大阪府南部",
-        "530" => "兵庫県北部",
-        "531" => "兵庫県南東部",
-        "532" => "兵庫県南西部",
-        "535" => "兵庫県淡路島",
-        "540" => "奈良県",
-        "550" => "和歌山県北部",
-        "551" => "和歌山県南部",
-        "560" => "鳥取県東部",
-        "562" => "鳥取県中部",
-        "563" => "鳥取県西部",
-        "570" => "島根県東部",
-        "571" => "島根県西部",
-        "575" => "島根県隠岐",
-        "580" => "岡山県北部",
-        "581" => "岡山県南部",
-        "590" => "広島県北部",
-        "591" => "広島県南東部",
-        "592" => "広島県南西部",
-        "600" => "徳島県北部",
-        "601" => "徳島県南部",
-        "610" => "香川県東部",
-        "611" => "香川県西部",
-        "620" => "愛媛県東予",
-        "621" => "愛媛県中予",
-        "622" => "愛媛県南予",
-        "630" => "高知県東部",
-        "631" => "高知県中部",
-        "632" => "高知県西部",
-        "700" => "山口県北部",
-        "702" => "山口県西部",
-        "703" => "山口県東部",
-        "704" => "山口県中部",
-        "710" => "福岡県福岡",
-        "711" => "福岡県北九州",
-        "712" => "福岡県筑豊",
-        "713" => "福岡県筑後",
-        "720" => "佐賀県北部",
-        "721" => "佐賀県南部",
-        "730" => "長崎県北部",
-        "731" => "長崎県南西部",
-        "732" => "長崎県島原半島",
-        "735" => "長崎県対馬",
-        "736" => "長崎県壱岐",
-        "737" => "長崎県五島",
-        "740" => "熊本県阿蘇",
-        "741" => "熊本県熊本",
-        "742" => "熊本県球磨",
-        "743" => "熊本県天草・芦北",
-        "750" => "大分県北部",
-        "751" => "大分県中部",
-        "752" => "大分県南部",
-        "753" => "大分県西部",
-        "760" => "宮崎県北部平野部",
-        "761" => "宮崎県北部山沿い",
-        "762" => "宮崎県南部平野部",
-        "763" => "宮崎県南部山沿い",
-        "770" => "鹿児島県薩摩",
-        "771" => "鹿児島県大隅",
-        "774" => "鹿児島県十島村",
-        "775" => "鹿児島県甑島",
-        "776" => "鹿児島県種子島",
-        "777" => "鹿児島県屋久島",
-        "778" => "鹿児島県奄美北部",
-        "779" => "鹿児島県奄美南部",
-        "800" => "沖縄県本島北部",
-        "801" => "沖縄県本島中南部",
-        "802" => "沖縄県久米島",
-        "803" => "沖縄県大東島",
-        "804" => "沖縄県宮古島",
-        "805" => "沖縄県石垣島",
-        "806" => "沖縄県与那国島",
-        "807" => "沖縄県西表島",
-        _ => "",
-    }
+    crate::codes::region(code).unwrap_or("")
 }
 
 #[cfg(test)]
@@ -1254,10 +836,10 @@ mod tests {
         let decoded = decoder(DATA, telegram_for_json(DATA)).unwrap();
         assert_eq!(decoded.EqID, "20240101161010");
         assert_eq!(decoded.WarnNum, "46");
-        assert_eq!(decoded.ShinouLat, 37.6);
-        assert_eq!(decoded.ShinouLng, 137.2);
-        assert_eq!(decoded.ShinouDpth, 10);
-        assert_eq!(decoded.Magnitude, 7.4);
+        assert_eq!(decoded.ShinouLat, Some(37.6));
+        assert_eq!(decoded.ShinouLng, Some(137.2));
+        assert_eq!(decoded.ShinouDpth, Some(10));
+        assert_eq!(decoded.Magnitude, Some(7.4));
         assert_eq!(decoded.Shindo, "7");
         assert_eq!(decoded.Ebis.len(), 45);
         assert!(decoded.Telegram.ends_with('='));
@@ -1284,8 +866,8 @@ mod tests {
     fn south_and_west_coordinates_are_negative() {
         let telegram = "37 03 00 260716090200 C11 260716090107 ND20260716090114 NCN001 JD////////////// JN/// 340 S357 W1407 050 45 03 RK44559 RT00/// RC0//// 9999=";
         let decoded = decoder(telegram, telegram.to_string()).unwrap();
-        assert_eq!(decoded.ShinouLat, -35.7);
-        assert_eq!(decoded.ShinouLng, -140.7);
+        assert_eq!(decoded.ShinouLat, Some(-35.7));
+        assert_eq!(decoded.ShinouLng, Some(-140.7));
     }
 
     #[test]

@@ -1,0 +1,2265 @@
+{
+    "_originalId": "TELEGRAM_ID",
+    "_schema": {
+        "type": "eew-information",
+        "version": "1.0.0"
+    },
+    "type": "緊急地震速報（地震動予報）",
+    "title": "緊急地震速報（地震動予報）",
+    "status": "通常",
+    "infoType": "発表",
+    "editorialOffice": "気象庁本庁",
+    "publishingOffice": [
+        "気象庁"
+    ],
+    "pressDateTime": "2011-03-11T05:48:10Z",
+    "reportDateTime": "2011-03-11T14:48:10+09:00",
+    "targetDateTime": "2011-03-11T14:48:10+09:00",
+    "eventId": "20110311144640",
+    "serialNo": "23",
+    "infoKind": "緊急地震速報",
+    "infoKindVersion": "1.2_0",
+    "headline": "三陸沖で地震　東北　関東　北陸　甲信　東海　北海道　伊豆諸島　近畿で強い揺れ",
+    "body": {
+        "isLastInfo": false,
+        "isCanceled": false,
+        "isWarning": true,
+        "zones": [
+            {
+                "code": "9920",
+                "name": "東北",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9931",
+                "name": "関東",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9934",
+                "name": "北陸",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9935",
+                "name": "甲信",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9910",
+                "name": "北海道",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9936",
+                "name": "東海",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "9932",
+                "name": "伊豆諸島",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "9941",
+                "name": "近畿",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            }
+        ],
+        "prefectures": [
+            {
+                "code": "9040",
+                "name": "宮城",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9030",
+                "name": "岩手",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9070",
+                "name": "福島",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9060",
+                "name": "山形",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9050",
+                "name": "秋田",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9080",
+                "name": "茨城",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9020",
+                "name": "青森",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9090",
+                "name": "栃木",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9150",
+                "name": "新潟",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9120",
+                "name": "千葉",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9100",
+                "name": "群馬",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9110",
+                "name": "埼玉",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9131",
+                "name": "東京",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9200",
+                "name": "長野",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9140",
+                "name": "神奈川",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9012",
+                "name": "北海道道南",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9170",
+                "name": "石川",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "9190",
+                "name": "山梨",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "9220",
+                "name": "静岡",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "9132",
+                "name": "伊豆諸島",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "9011",
+                "name": "北海道道央",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "9270",
+                "name": "大阪",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            }
+        ],
+        "regions": [
+            {
+                "code": "222",
+                "name": "宮城県中部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "220",
+                "name": "宮城県北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "221",
+                "name": "宮城県南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "211",
+                "name": "岩手県沿岸南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "213",
+                "name": "岩手県内陸南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "210",
+                "name": "岩手県沿岸北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "251",
+                "name": "福島県浜通り",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "240",
+                "name": "山形県庄内",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "242",
+                "name": "山形県村山",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "250",
+                "name": "福島県中通り",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "212",
+                "name": "岩手県内陸北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "243",
+                "name": "山形県置賜",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "252",
+                "name": "福島県会津",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "233",
+                "name": "秋田県内陸南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "300",
+                "name": "茨城県北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "231",
+                "name": "秋田県沿岸南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "202",
+                "name": "青森県三八上北",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "301",
+                "name": "茨城県南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "203",
+                "name": "青森県下北",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "241",
+                "name": "山形県最上",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "310",
+                "name": "栃木県北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "311",
+                "name": "栃木県南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "372",
+                "name": "新潟県下越",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "230",
+                "name": "秋田県沿岸北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "232",
+                "name": "秋田県内陸北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "340",
+                "name": "千葉県北東部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "341",
+                "name": "千葉県北西部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "201",
+                "name": "青森県津軽南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "200",
+                "name": "青森県津軽北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "320",
+                "name": "群馬県北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "330",
+                "name": "埼玉県北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "331",
+                "name": "埼玉県南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "321",
+                "name": "群馬県南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "350",
+                "name": "東京都２３区",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "342",
+                "name": "千葉県南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "371",
+                "name": "新潟県中越",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "375",
+                "name": "新潟県佐渡",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "420",
+                "name": "長野県北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "421",
+                "name": "長野県中部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "360",
+                "name": "神奈川県東部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "370",
+                "name": "新潟県上越",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "351",
+                "name": "東京都多摩東部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "106",
+                "name": "渡島地方東部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "107",
+                "name": "渡島地方西部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "151",
+                "name": "日高地方中部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "146",
+                "name": "胆振地方中東部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "390",
+                "name": "石川県能登",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "31",
+                        "name": "緊急地震速報（警報）"
+                    }
+                }
+            },
+            {
+                "code": "352",
+                "name": "東京都多摩西部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "411",
+                "name": "山梨県中・西部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "440",
+                "name": "静岡県伊豆",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "441",
+                "name": "静岡県東部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "110",
+                "name": "檜山地方",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "355",
+                "name": "伊豆大島",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "145",
+                "name": "胆振地方西部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "102",
+                "name": "石狩地方南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "356",
+                "name": "新島",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "100",
+                "name": "石狩地方北部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            },
+            {
+                "code": "521",
+                "name": "大阪府南部",
+                "kind": {
+                    "code": "31",
+                    "name": "緊急地震速報（警報）",
+                    "lastKind": {
+                        "code": "00",
+                        "name": "なし"
+                    }
+                }
+            }
+        ],
+        "earthquake": {
+            "originTime": "2011-03-11T14:46:16+09:00",
+            "arrivalTime": "2011-03-11T14:46:40+09:00",
+            "hypocenter": {
+                "code": "288",
+                "name": "三陸沖",
+                "coordinate": {
+                    "latitude": {
+                        "text": "38.1˚N",
+                        "value": "38.1000"
+                    },
+                    "longitude": {
+                        "text": "142.9˚E",
+                        "value": "142.9000"
+                    },
+                    "height": {
+                        "type": "高さ",
+                        "unit": "m",
+                        "value": "-10000"
+                    },
+                    "geodeticSystem": "日本測地系"
+                },
+                "depth": {
+                    "type": "深さ",
+                    "unit": "km",
+                    "value": "10"
+                },
+                "reduce": {
+                    "code": "9738",
+                    "name": "三陸沖"
+                },
+                "landOrSea": "海域",
+                "accuracy": {
+                    "epicenters": [
+                        "4",
+                        "4"
+                    ],
+                    "depth": "4",
+                    "magnitudeCalculation": "5",
+                    "numberOfMagnitudeCalculation": "5"
+                }
+            },
+            "magnitude": {
+                "type": "マグニチュード",
+                "value": "8.4",
+                "unit": "Mj"
+            }
+        },
+        "intensity": {
+            "forecastMaxInt": {
+                "from": "6+",
+                "to": "6+"
+            },
+            "forecastMaxLgInt": {
+                "from": "4",
+                "to": "4"
+            },
+            "appendix": {
+                "maxIntChange": "0",
+                "maxLgIntChange": "0",
+                "maxIntChangeReason": "0"
+            },
+            "regions": [
+                {
+                    "code": "220",
+                    "name": "宮城県北部",
+                    "forecastMaxInt": {
+                        "from": "6+",
+                        "to": "6+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "222",
+                    "name": "宮城県中部",
+                    "forecastMaxInt": {
+                        "from": "6+",
+                        "to": "6+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "221",
+                    "name": "宮城県南部",
+                    "forecastMaxInt": {
+                        "from": "6+",
+                        "to": "6+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2011-03-11T14:47:22+09:00"
+                },
+                {
+                    "code": "211",
+                    "name": "岩手県沿岸南部",
+                    "forecastMaxInt": {
+                        "from": "6+",
+                        "to": "6+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2011-03-11T14:47:25+09:00"
+                },
+                {
+                    "code": "213",
+                    "name": "岩手県内陸南部",
+                    "forecastMaxInt": {
+                        "from": "6-",
+                        "to": "6-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "210",
+                    "name": "岩手県沿岸北部",
+                    "forecastMaxInt": {
+                        "from": "6-",
+                        "to": "6-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2011-03-11T14:47:22+09:00"
+                },
+                {
+                    "code": "251",
+                    "name": "福島県浜通り",
+                    "forecastMaxInt": {
+                        "from": "6-",
+                        "to": "6-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "242",
+                    "name": "山形県村山",
+                    "forecastMaxInt": {
+                        "from": "6-",
+                        "to": "6-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:10+09:00"
+                },
+                {
+                    "code": "250",
+                    "name": "福島県中通り",
+                    "forecastMaxInt": {
+                        "from": "6-",
+                        "to": "6-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:05+09:00"
+                },
+                {
+                    "code": "212",
+                    "name": "岩手県内陸北部",
+                    "forecastMaxInt": {
+                        "from": "6+",
+                        "to": "6+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2011-03-11T14:47:37+09:00"
+                },
+                {
+                    "code": "243",
+                    "name": "山形県置賜",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "5+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:21+09:00"
+                },
+                {
+                    "code": "252",
+                    "name": "福島県会津",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "5+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:22+09:00"
+                },
+                {
+                    "code": "233",
+                    "name": "秋田県内陸南部",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "5+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:23+09:00"
+                },
+                {
+                    "code": "300",
+                    "name": "茨城県北部",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "5+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:24+09:00"
+                },
+                {
+                    "code": "240",
+                    "name": "山形県庄内",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "5+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:27+09:00"
+                },
+                {
+                    "code": "231",
+                    "name": "秋田県沿岸南部",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "5+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:30+09:00"
+                },
+                {
+                    "code": "202",
+                    "name": "青森県三八上北",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "5+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:34+09:00"
+                },
+                {
+                    "code": "301",
+                    "name": "茨城県南部",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "5+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:34+09:00"
+                },
+                {
+                    "code": "203",
+                    "name": "青森県下北",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "5+"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:49+09:00"
+                },
+                {
+                    "code": "241",
+                    "name": "山形県最上",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:15+09:00"
+                },
+                {
+                    "code": "310",
+                    "name": "栃木県北部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:30+09:00"
+                },
+                {
+                    "code": "311",
+                    "name": "栃木県南部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:34+09:00"
+                },
+                {
+                    "code": "372",
+                    "name": "新潟県下越",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:34+09:00"
+                },
+                {
+                    "code": "230",
+                    "name": "秋田県沿岸北部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:37+09:00"
+                },
+                {
+                    "code": "232",
+                    "name": "秋田県内陸北部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:37+09:00"
+                },
+                {
+                    "code": "340",
+                    "name": "千葉県北東部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:38+09:00"
+                },
+                {
+                    "code": "341",
+                    "name": "千葉県北西部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:43+09:00"
+                },
+                {
+                    "code": "201",
+                    "name": "青森県津軽南部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:44+09:00"
+                },
+                {
+                    "code": "200",
+                    "name": "青森県津軽北部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:46+09:00"
+                },
+                {
+                    "code": "320",
+                    "name": "群馬県北部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:46+09:00"
+                },
+                {
+                    "code": "330",
+                    "name": "埼玉県北部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:47+09:00"
+                },
+                {
+                    "code": "331",
+                    "name": "埼玉県南部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:48+09:00"
+                },
+                {
+                    "code": "321",
+                    "name": "群馬県南部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:49+09:00"
+                },
+                {
+                    "code": "350",
+                    "name": "東京都２３区",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:51+09:00"
+                },
+                {
+                    "code": "342",
+                    "name": "千葉県南部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:52+09:00"
+                },
+                {
+                    "code": "371",
+                    "name": "新潟県中越",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:52+09:00"
+                },
+                {
+                    "code": "375",
+                    "name": "新潟県佐渡",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "1",
+                        "to": "1"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:56+09:00"
+                },
+                {
+                    "code": "420",
+                    "name": "長野県北部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:56+09:00"
+                },
+                {
+                    "code": "360",
+                    "name": "神奈川県東部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:57+09:00"
+                },
+                {
+                    "code": "370",
+                    "name": "新潟県上越",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:57+09:00"
+                },
+                {
+                    "code": "352",
+                    "name": "東京都多摩西部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "1",
+                        "to": "1"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:48:59+09:00"
+                },
+                {
+                    "code": "351",
+                    "name": "東京都多摩東部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:00+09:00"
+                },
+                {
+                    "code": "106",
+                    "name": "渡島地方東部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:05+09:00"
+                },
+                {
+                    "code": "107",
+                    "name": "渡島地方西部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:05+09:00"
+                },
+                {
+                    "code": "151",
+                    "name": "日高地方中部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:13+09:00"
+                },
+                {
+                    "code": "110",
+                    "name": "檜山地方",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:14+09:00"
+                },
+                {
+                    "code": "411",
+                    "name": "山梨県中・西部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:14+09:00"
+                },
+                {
+                    "code": "146",
+                    "name": "胆振地方中東部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:23+09:00"
+                },
+                {
+                    "code": "145",
+                    "name": "胆振地方西部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:25+09:00"
+                },
+                {
+                    "code": "102",
+                    "name": "石狩地方南部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:26+09:00"
+                },
+                {
+                    "code": "356",
+                    "name": "新島",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:26+09:00"
+                },
+                {
+                    "code": "390",
+                    "name": "石川県能登",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:26+09:00"
+                },
+                {
+                    "code": "421",
+                    "name": "長野県中部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:14+09:00"
+                },
+                {
+                    "code": "355",
+                    "name": "伊豆大島",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:16+09:00"
+                },
+                {
+                    "code": "440",
+                    "name": "静岡県伊豆",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:16+09:00"
+                },
+                {
+                    "code": "441",
+                    "name": "静岡県東部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:18+09:00"
+                },
+                {
+                    "code": "100",
+                    "name": "石狩地方北部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "2",
+                        "to": "2"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:49:36+09:00"
+                },
+                {
+                    "code": "521",
+                    "name": "大阪府南部",
+                    "forecastMaxInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "forecastMaxLgInt": {
+                        "from": "3",
+                        "to": "3"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "10"
+                    },
+                    "arrivalTime": "2011-03-11T14:50:35+09:00"
+                }
+            ]
+        },
+        "comments": {
+            "warning": {
+                "text": "強い揺れに警戒してください。",
+                "codes": [
+                    "0201"
+                ]
+            }
+        }
+    }
+}

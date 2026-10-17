@@ -1,0 +1,86 @@
+{
+  "_originalId": "79e32069f441a4cfc4cda0351c6d65c2ae022038aa2204586ed55f025604ee139d96a4bbe6f3b562627d05dfe9527315",
+  "_schema": {
+    "type": "eew-information",
+    "version": "1.0.0"
+  },
+  "body": {
+    "earthquake": {
+      "arrivalTime": "2026-10-16T12:38:10+09:00",
+      "hypocenter": {
+        "accuracy": {
+          "depth": "4",
+          "epicenters": [
+            "4",
+            "4"
+          ],
+          "magnitudeCalculation": "3",
+          "numberOfMagnitudeCalculation": "1"
+        },
+        "code": "187",
+        "coordinate": {
+          "height": {
+            "type": "高さ",
+            "unit": "m",
+            "value": "-10000"
+          },
+          "latitude": {
+            "text": "44.6˚N",
+            "value": "44.6000"
+          },
+          "longitude": {
+            "text": "147.6˚E",
+            "value": "147.6000"
+          }
+        },
+        "depth": {
+          "type": "深さ",
+          "unit": "km",
+          "value": "10"
+        },
+        "landOrSea": "海域",
+        "name": "択捉島付近",
+        "reduce": {
+          "code": "9706",
+          "name": "択捉島付近"
+        }
+      },
+      "magnitude": {
+        "type": "マグニチュード",
+        "unit": "Mj",
+        "value": "6.2"
+      },
+      "originTime": "2026-10-16T12:37:38+09:00"
+    },
+    "intensity": {
+      "forecastMaxInt": {
+        "from": "3",
+        "to": "3"
+      },
+      "forecastMaxLgInt": {
+        "from": "0",
+        "to": "0"
+      },
+      "regions": []
+    },
+    "isCanceled": false,
+    "isLastInfo": false,
+    "isWarning": false
+  },
+  "editorialOffice": "気象庁本庁",
+  "eventId": "20261016123810",
+  "headline": null,
+  "infoKind": "緊急地震速報",
+  "infoKindVersion": "1.2_0",
+  "infoType": "発表",
+  "pressDateTime": "2026-10-16T03:38:27Z",
+  "publishingOffice": [
+    "気象庁"
+  ],
+  "reportDateTime": "2026-10-16T12:38:27+09:00",
+  "serialNo": "1",
+  "status": "通常",
+  "targetDateTime": "2026-10-16T12:38:27+09:00",
+  "title": "緊急地震速報（地震動予報）",
+  "type": "緊急地震速報（地震動予報）"
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "path": "official_100gal_first.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230513161031/vxse45/xml/VXSE45_JPOS_20230513071032948_51f526b.xml",
+    "sha256": "c8fe5c5c718fc2699fa673306ff8562b4f1b402ef6a9fdfa787b8e069359a2ef",
+    "identicalTo": "official/100gal-first.xml"
+  },
+  {
+    "path": "official_noto_cancellation.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20240101161133/vxse45/xml/VXSE45_RJTD_20240101071146049_05be654.xml",
+    "sha256": "a361439282f03c376bc132021e8dbee7d2324f61b63e92abc916571cc2e205f6"
+  },
+  {
+    "path": "official_noto_final.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20240101161010/vxse45/xml/VXSE45_RJTD_20240101071418538_2217957.xml",
+    "sha256": "a816776a55655fc045e732c01a8f88e699654199490b7b3574c5916b78903748",
+    "identicalTo": "official/noto-last.xml"
+  },
+  {
+    "path": "official_noto_first.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20240101161010/vxse45/xml/VXSE45_RJTD_20240101071016067_2e3c66b.xml",
+    "sha256": "186b56f2894e98480c483c985826dcfcfc1bdcf1d1e6d7bc797ef0e7deb4881b",
+    "identicalTo": "official/noto-first.xml"
+  },
+  {
+    "path": "official_plum_cancellation.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230906063640/vxse45/xml/VXSE45_JPOS_20230905213752660_4949e2a.xml",
+    "sha256": "117a4788c893a4e0b1ead2b991c793927768dcc707304aacb68873c38fa7a8d7",
+    "identicalTo": "official/cancel-last.xml"
+  },
+  {
+    "path": "official_plum_forecast.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230906063640/vxse45/xml/VXSE45_JPOS_20230905213732961_8225189.xml",
+    "sha256": "a3a95b236818d49e0bf2678e510ce63b3731fcc255af22aff6d16f5477f2e490",
+    "identicalTo": "official/cancel-first.xml"
+  },
+  {
+    "path": "official_plum_warning.xml",
+    "kind": "Official XML",
+    "url": "https://sample.dmdata.jp/eew/20230505215718/vxse43/xml/VXSE43_RJTD_20230505125817009_598f2b7.xml",
+    "sha256": "0e5866c123e4959d84e106f9c0d3dc05e293ad00197581442a2c46dddf8557f1",
+    "identicalTo": "official/plum-warning-first.xml"
+  },
+  {
+    "path": "expected/official_100gal_first.telegram",
+    "kind": "Synthetic",
+    "sha256": "b2af6d7492dc16be249710650d8521d6f96f2697f72cc336aade38c853eddc66",
+    "note": "Frozen XML Encoder projection; NOT an original JMA Telegram. NCP layout corrected in this audit."
+  },
+  {
+    "path": "expected/official_noto_final.telegram",
+    "kind": "Synthetic",
+    "sha256": "6d0ff8755f040d19c520f7e953273a9128a61907f3c297836725f7657c4b9668",
+    "note": "Frozen XML Encoder projection; NOT an original JMA Telegram. NCP layout corrected in this audit."
+  },
+  {
+    "path": "expected/official_noto_first.telegram",
+    "kind": "Synthetic",
+    "sha256": "c4e06135e48664b63fc5d4b834d5a3bf42167783a3903264ad330d5332289fc2",
+    "note": "Frozen XML Encoder projection; NOT an original JMA Telegram. NCP layout corrected in this audit."
+  },
+  {
+    "path": "expected/official_plum_forecast.telegram",
+    "kind": "Synthetic",
+    "sha256": "e5b2abe4067bb00acbfb7027730a160e1ae20e606608edbcc7e35ce78eaa3cee",
+    "note": "Frozen XML Encoder projection; NOT an original JMA Telegram. NCP layout corrected in this audit."
+  },
+  {
+    "path": "expected/official_plum_warning.telegram",
+    "kind": "Synthetic",
+    "sha256": "b3d38124a931e4712889fd8aa9133c1a7d73609aa4e233d078f8fdbbf786b700",
+    "note": "Frozen XML Encoder projection; NOT an original JMA Telegram. NCP layout corrected in this audit."
+  },
+  {
+    "path": "../../data.txt",
+    "kind": "Observed Telegram",
+    "sha256": "dc854c632e31c8def89a73dc661b81b317280977c79e6f7d5e2e559fac710abb",
+    "note": "Pre-existing repository input; original network provenance not independently established."
+  }
+]

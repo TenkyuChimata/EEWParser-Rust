@@ -1,0 +1,576 @@
+{
+    "_originalId": "TELEGRAM_ID",
+    "_schema": {
+        "type": "eew-information",
+        "version": "1.0.0"
+    },
+    "type": "緊急地震速報（予報）",
+    "title": "緊急地震速報（予報）",
+    "status": "通常",
+    "infoType": "発表",
+    "editorialOffice": "気象庁本庁",
+    "publishingOffice": [
+        "気象庁"
+    ],
+    "pressDateTime": "2018-09-05T18:10:16Z",
+    "reportDateTime": "2018-09-06T03:10:16+09:00",
+    "targetDateTime": "2018-09-06T03:10:16+09:00",
+    "eventId": "20180906030805",
+    "serialNo": "26",
+    "infoKind": "緊急地震速報",
+    "infoKindVersion": "1.0_0",
+    "headline": null,
+    "body": {
+        "isLastInfo": true,
+        "isCanceled": false,
+        "isWarning": true,
+        "earthquake": {
+            "originTime": "2018-09-06T03:07:59+09:00",
+            "arrivalTime": "2018-09-06T03:08:05+09:00",
+            "hypocenter": {
+                "code": "146",
+                "name": "胆振地方中東部",
+                "coordinate": {
+                    "latitude": {
+                        "text": "42.7˚N",
+                        "value": "42.7000"
+                    },
+                    "longitude": {
+                        "text": "142.0˚E",
+                        "value": "142.0000"
+                    },
+                    "height": {
+                        "type": "高さ",
+                        "unit": "m",
+                        "value": "-30000"
+                    },
+                    "geodeticSystem": "日本測地系"
+                },
+                "depth": {
+                    "type": "深さ",
+                    "unit": "km",
+                    "value": "30"
+                },
+                "reduce": {
+                    "code": "9012",
+                    "name": "北海道道南"
+                },
+                "landOrSea": "内陸",
+                "accuracy": {
+                    "epicenters": [
+                        "6",
+                        "9"
+                    ],
+                    "depth": "6",
+                    "magnitudeCalculation": "5",
+                    "numberOfMagnitudeCalculation": "5"
+                }
+            },
+            "magnitude": {
+                "type": "マグニチュード",
+                "value": "7.0",
+                "unit": "Mj"
+            }
+        },
+        "intensity": {
+            "forecastMaxInt": {
+                "from": "7",
+                "to": "7"
+            },
+            "appendix": {
+                "maxIntChange": "0",
+                "maxIntChangeReason": "0"
+            },
+            "regions": [
+                {
+                    "code": "146",
+                    "name": "胆振地方中東部",
+                    "forecastMaxInt": {
+                        "from": "7",
+                        "to": "7"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2018-09-06T03:08:16+09:00"
+                },
+                {
+                    "code": "102",
+                    "name": "石狩地方南部",
+                    "forecastMaxInt": {
+                        "from": "6+",
+                        "to": "6+"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2018-09-06T03:08:16+09:00"
+                },
+                {
+                    "code": "150",
+                    "name": "日高地方西部",
+                    "forecastMaxInt": {
+                        "from": "6+",
+                        "to": "6+"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2018-09-06T03:08:16+09:00"
+                },
+                {
+                    "code": "122",
+                    "name": "空知地方南部",
+                    "forecastMaxInt": {
+                        "from": "5+",
+                        "to": "6-"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "100",
+                    "name": "石狩地方北部",
+                    "forecastMaxInt": {
+                        "from": "6-",
+                        "to": "6-"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2018-09-06T03:08:36+09:00"
+                },
+                {
+                    "code": "101",
+                    "name": "石狩地方中部",
+                    "forecastMaxInt": {
+                        "from": "6-",
+                        "to": "6-"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2018-09-06T03:08:36+09:00"
+                },
+                {
+                    "code": "151",
+                    "name": "日高地方中部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5+"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "145",
+                    "name": "胆振地方西部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "121",
+                    "name": "空知地方中部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "155",
+                    "name": "十勝地方北部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "152",
+                    "name": "日高地方東部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "115",
+                    "name": "後志地方北部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "106",
+                    "name": "渡島地方東部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "156",
+                    "name": "十勝地方中部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "5-"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "127",
+                    "name": "上川地方南部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "5-"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "120",
+                    "name": "空知地方北部",
+                    "forecastMaxInt": {
+                        "from": "5-",
+                        "to": "5-"
+                    },
+                    "isPlum": true,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "19"
+                    },
+                    "arrivalTime": "2018-09-06T03:08:39+09:00"
+                },
+                {
+                    "code": "116",
+                    "name": "後志地方東部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "126",
+                    "name": "上川地方中部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "157",
+                    "name": "十勝地方南部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "117",
+                    "name": "後志地方西部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "105",
+                    "name": "渡島地方北部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "131",
+                    "name": "留萌地方南部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "125",
+                    "name": "上川地方北部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "110",
+                    "name": "檜山地方",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "161",
+                    "name": "釧路地方中南部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "142",
+                    "name": "紋別地方",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "203",
+                    "name": "青森県下北",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": true,
+                    "kind": {
+                        "name": "緊急地震速報（警報）",
+                        "code": "11"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "107",
+                    "name": "渡島地方西部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "130",
+                    "name": "留萌地方中北部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "200",
+                    "name": "青森県津軽北部",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "202",
+                    "name": "青森県三八上北",
+                    "forecastMaxInt": {
+                        "from": "4",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                },
+                {
+                    "code": "140",
+                    "name": "網走地方",
+                    "forecastMaxInt": {
+                        "from": "3",
+                        "to": "4"
+                    },
+                    "isPlum": false,
+                    "isWarning": false,
+                    "kind": {
+                        "name": "緊急地震速報（予報）",
+                        "code": "01"
+                    },
+                    "condition": "既に主要動到達と推測"
+                }
+            ]
+        },
+        "comments": {
+            "warning": {
+                "text": "強い揺れに警戒してください。",
+                "codes": [
+                    "0201"
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,91 @@
+{
+  "_originalId": "7e028634c5d60f57126a3821aacf235d873efaa7b4929babb5831e2d3a20f790dd68d6c0f982c76c95b4c4f243ab08d8",
+  "_schema": {
+    "type": "eew-information",
+    "version": "1.0.0"
+  },
+  "body": {
+    "earthquake": {
+      "arrivalTime": "2026-10-16T12:38:10+09:00",
+      "hypocenter": {
+        "accuracy": {
+          "depth": "4",
+          "epicenters": [
+            "4",
+            "4"
+          ],
+          "magnitudeCalculation": "5",
+          "numberOfMagnitudeCalculation": "5"
+        },
+        "code": "912",
+        "coordinate": {
+          "height": {
+            "type": "高さ",
+            "unit": "m",
+            "value": "-140000"
+          },
+          "latitude": {
+            "text": "48.2˚N",
+            "value": "48.2000"
+          },
+          "longitude": {
+            "text": "153.4˚E",
+            "value": "153.4000"
+          }
+        },
+        "depth": {
+          "type": "深さ",
+          "unit": "km",
+          "value": "140"
+        },
+        "landOrSea": "海域",
+        "name": "千島列島",
+        "reduce": {
+          "code": "9913",
+          "name": "千島列島\n"
+        }
+      },
+      "magnitude": {
+        "type": "マグニチュード",
+        "unit": "Mj",
+        "value": "9.9"
+      },
+      "originTime": "2026-10-16T12:36:27+09:00"
+    },
+    "intensity": {
+      "appendix": {
+        "maxIntChange": "0",
+        "maxIntChangeReason": "0",
+        "maxLgIntChange": "0"
+      },
+      "forecastMaxInt": {
+        "from": "2",
+        "to": "2"
+      },
+      "forecastMaxLgInt": {
+        "from": "0",
+        "to": "0"
+      },
+      "regions": []
+    },
+    "isCanceled": false,
+    "isLastInfo": false,
+    "isWarning": false
+  },
+  "editorialOffice": "気象庁本庁",
+  "eventId": "20261016123810",
+  "headline": null,
+  "infoKind": "緊急地震速報",
+  "infoKindVersion": "1.2_0",
+  "infoType": "発表",
+  "pressDateTime": "2026-10-16T03:39:23Z",
+  "publishingOffice": [
+    "気象庁"
+  ],
+  "reportDateTime": "2026-10-16T12:39:23+09:00",
+  "serialNo": "15",
+  "status": "通常",
+  "targetDateTime": "2026-10-16T12:39:23+09:00",
+  "title": "緊急地震速報（地震動予報）",
+  "type": "緊急地震速報（地震動予報）"
+}
