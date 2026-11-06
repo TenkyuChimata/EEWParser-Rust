@@ -9,6 +9,7 @@ pub(crate) const NS_ELEMENT: &str = "http://xml.kishou.go.jp/jmaxml1/elementBasi
 
 use chrono::DateTime;
 use roxmltree::{Document, Node, ParsingOptions};
+use std::borrow::Cow;
 
 pub fn parse(raw: &str) -> Result<EewInformation, EewError> {
     let xml = raw.strip_prefix('\u{feff}').unwrap_or(raw).trim_start();
@@ -31,7 +32,7 @@ pub fn parse(raw: &str) -> Result<EewInformation, EewError> {
     let head = required(root, IB, "Head")?;
     let body_node = required(root, SEIS, "Body")?;
     let control_title = text(control, JMX, "Title")?;
-    let product = Product::from_control_title(control_title);
+    let product = Product::from_control_title(&control_title);
     if product == Product::Unknown {
         return Err(EewError::UnsupportedXml(format!(
             "unknown Control/Title {control_title:?}"
@@ -44,13 +45,13 @@ pub fn parse(raw: &str) -> Result<EewInformation, EewError> {
         )));
     }
     let version = text(head, IB, "InfoKindVersion")?;
-    if !matches!(version, "1.0_0" | "1.1_0" | "1.2_0") {
+    if !matches!(version.as_ref(), "1.0_0" | "1.1_0" | "1.2_0") {
         return Err(EewError::UnsupportedXml(format!(
             "unsupported InfoKindVersion {version:?}"
         )));
     }
-    let status = Status::from_text(text(control, JMX, "Status")?);
-    let info_type = InfoType::from_text(text(head, IB, "InfoType")?);
+    let status = Status::from_text(&text(control, JMX, "Status")?);
+    let info_type = InfoType::from_text(&text(head, IB, "InfoType")?);
     if let InfoType::Other(value) = &info_type {
         return Err(EewError::UnsupportedXml(format!(
             "unknown InfoType {value:?}: lifecycle cannot be determined"
@@ -95,9 +96,9 @@ pub fn parse(raw: &str) -> Result<EewInformation, EewError> {
                 .map(str::to_owned)
                 .collect(),
         ),
-        press_date_time: Some(time(text(control, JMX, "DateTime")?, "Control/DateTime")?),
+        press_date_time: Some(time(&text(control, JMX, "DateTime")?, "Control/DateTime")?),
         report_date_time: Some(time(
-            text(head, IB, "ReportDateTime")?,
+            &text(head, IB, "ReportDateTime")?,
             "Head/ReportDateTime",
         )?),
         target_date_time: optional_time(head, IB, "TargetDateTime")?,
@@ -212,7 +213,8 @@ fn earthquake(node: Node<'_, '_>) -> Result<Earthquake, EewError> {
     let (coordinate, depth) = coordinate(required(area, EB, "Coordinate")?)?;
     let magnitude = Some(required(node, EB, "Magnitude")?)
         .map(|m| {
-            let raw = m.text().unwrap_or("").trim();
+            let content = scalar_text(m);
+            let raw = content.trim();
             let value = if raw.is_empty() || raw == "NaN" {
                 None
             } else {
@@ -239,7 +241,7 @@ fn earthquake(node: Node<'_, '_>) -> Result<Earthquake, EewError> {
         let rank = |name, attr| {
             child(a, SEIS, name)
                 .and_then(|n| n.attribute(attr))
-                .map(str::to_owned)
+                .map(|s| s.trim().to_owned())
         };
         Accuracy {
             epicenters: [rank("Epicenter", "rank"), rank("Epicenter", "rank2")],
@@ -255,7 +257,7 @@ fn earthquake(node: Node<'_, '_>) -> Result<Earthquake, EewError> {
     Ok(Earthquake {
         origin_time: optional_time(node, SEIS, "OriginTime")?,
         arrival_time: Some(time(
-            text(node, SEIS, "ArrivalTime")?,
+            &text(node, SEIS, "ArrivalTime")?,
             "Earthquake/ArrivalTime",
         )?),
         condition: optional_text(node, SEIS, "Condition"),
@@ -272,7 +274,8 @@ fn earthquake(node: Node<'_, '_>) -> Result<Earthquake, EewError> {
 }
 
 fn coordinate(node: Node<'_, '_>) -> Result<(Coordinate, Option<Quantity>), EewError> {
-    let raw = node.text().unwrap_or("").trim();
+    let content = scalar_text(node);
+    let raw = content.trim();
     let mut result = Coordinate {
         geodetic_system: node.attribute("datum").map(str::to_owned),
         condition: node.attribute("condition").map(str::to_owned),
@@ -412,9 +415,9 @@ fn intensity(node: Node<'_, '_>, product: Product) -> Result<Intensity, EewError
             for a in children(p, SEIS, "Area") {
                 for c in children(a, SEIS, "City") {
                     for s in children(c, SEIS, "IntensityStation") {
-                        let k = text(s, SEIS, "K")?.to_owned();
+                        let k = text(s, SEIS, "K")?.into_owned();
                         number(&k, "IntensityStation/K")?;
-                        let int = IntensityValue::from_text(text(s, SEIS, "Int")?);
+                        let int = IntensityValue::from_text(&text(s, SEIS, "Int")?);
                         if matches!(int, IntensityValue::Over) {
                             return Err(invalid("station intensity cannot be over"));
                         }
@@ -432,8 +435,8 @@ fn intensity(node: Node<'_, '_>, product: Product) -> Result<Intensity, EewError
     Ok(result)
 }
 fn int_range(n: Node<'_, '_>) -> Result<ForecastRange<IntensityValue>, EewError> {
-    let from = IntensityValue::from_text(text(n, SEIS, "From")?);
-    let to = IntensityValue::from_text(text(n, SEIS, "To")?);
+    let from = IntensityValue::from_text(&text(n, SEIS, "From")?);
+    let to = IntensityValue::from_text(&text(n, SEIS, "To")?);
     if from == IntensityValue::Over {
         return Err(invalid("ForecastInt/From cannot be over"));
     }
@@ -443,8 +446,8 @@ fn int_range(n: Node<'_, '_>) -> Result<ForecastRange<IntensityValue>, EewError>
     Ok(ForecastRange { from, to })
 }
 fn lg_range(n: Node<'_, '_>) -> Result<ForecastRange<LgIntensityValue>, EewError> {
-    let from = LgIntensityValue::from_text(text(n, SEIS, "From")?);
-    let to = LgIntensityValue::from_text(text(n, SEIS, "To")?);
+    let from = LgIntensityValue::from_text(&text(n, SEIS, "From")?);
+    let to = LgIntensityValue::from_text(&text(n, SEIS, "To")?);
     if from == LgIntensityValue::Over {
         return Err(invalid("ForecastLgInt/From cannot be over"));
     }
@@ -497,11 +500,10 @@ fn warning_areas(headline: Option<Node<'_, '_>>, body: &mut Body) -> Result<(), 
 fn comments(n: Node<'_, '_>) -> Result<Comments, EewError> {
     let warning = child(n, SEIS, "WarningComment").map(|w| WarningComment {
         text: optional_text(w, SEIS, "Text").unwrap_or_default(),
-        codes: children(w, SEIS, "Code")
-            .filter_map(|n| n.text())
-            .flat_map(str::split_whitespace)
-            .map(str::to_owned)
-            .collect(),
+        codes: children(w, SEIS, "Code").fold(Vec::new(), |mut codes, n| {
+            codes.extend(scalar_text(n).split_whitespace().map(str::to_owned));
+            codes
+        }),
     });
     Ok(Comments {
         free: optional_text(n, SEIS, "FreeFormComment"),
@@ -515,6 +517,7 @@ fn code_name(n: Node<'_, '_>, ns: &str) -> Result<CodeName, EewError> {
     })
 }
 fn time(raw: &str, field: &str) -> Result<String, EewError> {
+    let raw = raw.trim();
     DateTime::parse_from_rfc3339(raw).map_err(|_| invalid(format!("{field} requires RFC3339")))?;
     Ok(raw.to_owned())
 }
@@ -554,16 +557,34 @@ fn required<'a, 'i>(n: Node<'a, 'i>, ns: &str, name: &str) -> Result<Node<'a, 'i
 }
 fn optional_text(n: Node<'_, '_>, ns: &str, name: &str) -> Option<String> {
     child(n, ns, name)
-        .and_then(|n| n.text())
+        .map(|n| scalar_text(n).into_owned())
         .filter(|s| !s.trim().is_empty())
-        .map(str::to_owned)
 }
-fn text<'a>(n: Node<'a, '_>, ns: &str, name: &str) -> Result<&'a str, EewError> {
-    child(n, ns, name)
-        .and_then(|n| n.text())
-        .map(str::trim)
-        .filter(|s| !s.is_empty())
-        .ok_or_else(|| invalid(name))
+fn text<'a>(n: Node<'a, '_>, ns: &str, name: &str) -> Result<Cow<'a, str>, EewError> {
+    let value = scalar_text(child(n, ns, name).ok_or_else(|| invalid(name))?);
+    let value = match value {
+        Cow::Borrowed(s) => Cow::Borrowed(s.trim()),
+        Cow::Owned(s) => Cow::Owned(s.trim().to_owned()),
+    };
+    if value.is_empty() {
+        return Err(invalid(name));
+    }
+    Ok(value)
+}
+/// XML comments and CDATA boundaries do not split a simple-content value.
+/// The usual single text node is borrowed directly from the existing DOM.
+pub(crate) fn scalar_text<'a>(node: Node<'a, '_>) -> Cow<'a, str> {
+    let mut texts = node.children().filter(|n| n.is_text());
+    let first = texts.next().and_then(|n| n.text()).unwrap_or_default();
+    if texts.next().is_none() {
+        return Cow::Borrowed(first);
+    }
+    Cow::Owned(
+        node.children()
+            .filter(|n| n.is_text())
+            .filter_map(|n| n.text())
+            .collect(),
+    )
 }
 fn invalid(field: impl Into<String>) -> EewError {
     EewError::MissingXmlField(field.into())

@@ -1,12 +1,22 @@
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Datelike, FixedOffset};
 
 use crate::error::AppError;
+use crate::legacy_xml::unavailable;
 use crate::legacy_xml::{
     Earthquake, EewXmlDocument, Forecast, ForecastArea, InfoType, IntensityRange, WarningAreas,
     XmlProduct,
 };
 
 pub fn encode(document: &EewXmlDocument) -> Result<String, AppError> {
+    encode_document(document).map_err(|error| match error {
+        AppError::Unsupported { field, reason, .. } => {
+            document.unsupported(field.unwrap_or_default(), reason)
+        }
+        other => other,
+    })
+}
+
+fn encode_document(document: &EewXmlDocument) -> Result<String, AppError> {
     if document.info_type == InfoType::Correction {
         return Err(document.unsupported(
             "Head/InfoType",
@@ -16,7 +26,7 @@ pub fn encode(document: &EewXmlDocument) -> Result<String, AppError> {
     let code_type = select_code_type(document)?;
     let section = section_code(&document.editorial_office)?;
     let message_type = message_type(document)?;
-    let sent_at = telegram_time(&document.control_time);
+    let sent_at = telegram_time(&document.control_time)?;
     let mut lines = vec![format!(
         "{code_type} {section} {message_type} {sent_at} C11"
     )];
@@ -35,7 +45,14 @@ pub fn encode(document: &EewXmlDocument) -> Result<String, AppError> {
         _ => unreachable!(),
     }
     lines.push("9999=".to_string());
-    Ok(lines.join("\n"))
+    let telegram = lines.join("\n");
+    if telegram.len() > 3800 {
+        return Err(document.unsupported(
+            "Cnf",
+            "the generated message exceeds 3800 bytes and requires Telegram fragmentation",
+        ));
+    }
+    Ok(telegram)
 }
 
 pub fn select_code_type(document: &EewXmlDocument) -> Result<&'static str, AppError> {
@@ -63,10 +80,6 @@ pub fn select_code_type(document: &EewXmlDocument) -> Result<&'static str, AppEr
                 )),
             }
         }
-        (XmlProduct::Unknown, _) => Err(document.unsupported(
-            "Head/Title",
-            "the XML product type cannot be mapped to a Telegram code type",
-        )),
     }
 }
 
@@ -83,15 +96,42 @@ fn forecast_lines(document: &EewXmlDocument, code_type: &str) -> Result<Vec<Stri
         .as_ref()
         .ok_or_else(|| missing("Body/Earthquake"))?;
     let forecast = document.forecast.as_ref();
+    if code_type == "35"
+        && (earthquake.magnitude.is_some()
+            || earthquake.coordinate.depth_km != Some(10)
+            || earthquake.land_or_sea.is_some()
+            || forecast.is_some_and(|f| {
+                !f.areas.is_empty()
+                    || f.maximum_intensity
+                        .as_ref()
+                        .is_none_or(|r| r.from != "5-" || r.to != "over")
+            }))
+    {
+        return Err(missing(
+            "missing OriginTime is only defined for the 100-gal maximum-intensity-only report",
+        ));
+    }
+    if earthquake.assumed_hypocenter
+        && forecast.is_some_and(|f| f.areas.iter().any(|a| !a.kind_code.ends_with('9')))
+    {
+        return Err(missing(
+            "an assumed hypocenter can only contain PLUM forecast areas",
+        ));
+    }
     let event_time = earthquake
         .origin_time
         .as_ref()
         .unwrap_or(&earthquake.arrival_time);
     let mut lines = vec![
-        telegram_time(event_time),
+        telegram_time(event_time)?,
         forecast_identification(document)?,
     ];
-    lines.push(forecast_core(code_type, earthquake, forecast)?);
+    let warning = document.product == XmlProduct::Warning
+        || !document.warning_areas.current_regions.is_empty()
+        || !document.warning_areas.current_prefectures.is_empty()
+        || !document.warning_areas.current_districts.is_empty()
+        || forecast.is_some_and(|f| f.areas.iter().any(|a| a.kind_code.starts_with('1')));
+    lines.push(forecast_core(code_type, earthquake, forecast, warning)?);
     if code_type != "35"
         && let Some(forecast) = forecast
     {
@@ -119,6 +159,7 @@ fn forecast_core(
     code_type: &str,
     earthquake: &Earthquake,
     forecast: Option<&Forecast>,
+    warning: bool,
 ) -> Result<String, AppError> {
     let (latitude, longitude) = coordinate_codes(
         earthquake.coordinate.latitude,
@@ -135,7 +176,7 @@ fn forecast_core(
     } else {
         forecast
             .and_then(|forecast| forecast.maximum_intensity.as_ref())
-            .map(|range| intensity_code(&range.from))
+            .map(|range| maximum_intensity_code(code_type, earthquake.assumed_hypocenter, range))
             .transpose()?
             .unwrap_or_else(|| "//".to_string())
     };
@@ -162,7 +203,7 @@ fn forecast_core(
         rank(accuracy.epicenter_rank),
         rank(accuracy.depth_rank),
         rank(accuracy.magnitude_rank),
-        char::from(b'0' + accuracy.magnitude_stations),
+        rank(accuracy.magnitude_stations),
         rank(accuracy.epicenter_rank2)
     );
     let land = match (
@@ -174,12 +215,6 @@ fn forecast_core(
         (false, Some("海域")) => '1',
         (false, Some(_)) => return Err(missing("Earthquake/Hypocenter/Area/LandOrSea")),
     };
-    let warning = forecast.is_some_and(|forecast| {
-        forecast
-            .areas
-            .iter()
-            .any(|area| area.kind_code.starts_with('1'))
-    });
     let method = if earthquake.assumed_hypocenter {
         '9'
     } else {
@@ -249,7 +284,7 @@ fn warning_lines(document: &EewXmlDocument) -> Result<Vec<String>, AppError> {
         earthquake.coordinate.longitude,
     )?;
     let mut lines = vec![
-        telegram_time(origin),
+        telegram_time(origin)?,
         format!(
             "ND{} NCPN{}",
             document.event_id,
@@ -274,12 +309,14 @@ fn warning_lines(document: &EewXmlDocument) -> Result<Vec<String>, AppError> {
     let prc = if first || !has_additions {
         "PRC0000/".to_string()
     } else {
+        // XML describes changes in the maximum, not the cause of each new
+        // warning area. PRC has no codes for the combined/depth causes (3/4).
+        // Use its documented undefined value instead of guessing a cause.
         let reason = forecast
             .max_int_change_reason
             .filter(|value| matches!(value, 1 | 2 | 9))
-            .ok_or_else(|| {
-                missing("warning additions require Appendix/MaxIntChangeReason 1, 2, or 9")
-            })?;
+            .map(|value| char::from(b'0' + value))
+            .unwrap_or('/');
         format!(
             "PRC{}{}{}{reason}{}",
             u8::from(!areas.added_districts.is_empty()),
@@ -407,6 +444,12 @@ fn code_list_lines(marker: &str, codes: &[String]) -> Vec<String> {
 }
 
 fn ebi_intensity(range: &IntensityRange) -> Result<String, AppError> {
+    if matches!(range.from.as_str(), "0" | "不明") || range.to == "不明" {
+        return Err(unavailable(
+            "Forecast/Pref/Area/ForecastInt",
+            "EBI cannot express zero/unknown range bounds; // in the lower slot means a known lower bound with no upper limit",
+        ));
+    }
     let from = intensity_code(&range.from)?;
     if range.to == "over" {
         Ok(format!("{from}//"))
@@ -423,6 +466,24 @@ fn intensity_code(value: &str) -> Result<String, AppError> {
         "5-" | "5+" | "6-" | "6+" => Ok(value.to_string()),
         _ => Err(missing(format!("unsupported intensity {value:?}"))),
     }
+}
+
+fn maximum_intensity_code(
+    code_type: &str,
+    assumed: bool,
+    range: &IntensityRange,
+) -> Result<String, AppError> {
+    // ss is a scalar. Pattern 2 and PLUM interpret it as a lower bound;
+    // pattern 3 interprets it as a point. Never silently discard a finite
+    // upper bound, or turn a half-unknown range into a known value.
+    let lower_bound = code_type == "36" || assumed;
+    if (range.from != range.to && range.to != "over") || (range.to == "over" && !lower_bound) {
+        return Err(unavailable(
+            "Forecast/ForecastInt",
+            "the maximum intensity range cannot be represented by this Telegram pattern's scalar ss field",
+        ));
+    }
+    intensity_code(&range.from)
 }
 
 fn intensity_at_least_four(range: &IntensityRange) -> bool {
@@ -459,9 +520,10 @@ fn exact_tenths(value: f64, field: &str) -> Result<i64, AppError> {
     let scaled = value * 10.0;
     let rounded = scaled.round();
     if (scaled - rounded).abs() > 1e-7 {
-        return Err(missing(format!(
-            "{field} has more precision than Telegram's 0.1 degree field"
-        )));
+        return Err(unavailable(
+            field,
+            format!("{field} exceeds Telegram's one-decimal precision"),
+        ));
     }
     Ok(rounded as i64)
 }
@@ -482,7 +544,10 @@ fn magnitude_code(magnitude: Option<f64>) -> Result<String, AppError> {
     };
     let tenths = exact_tenths(magnitude, "magnitude")?;
     if !(0..=99).contains(&tenths) {
-        return Err(missing("magnitude does not fit Telegram's 2-digit field"));
+        return Err(unavailable(
+            "Magnitude",
+            "magnitude does not fit Telegram's 2-digit field",
+        ));
     }
     Ok(format!("{tenths:02}"))
 }
@@ -518,9 +583,10 @@ fn section_code(office: &str) -> Result<&'static str, AppError> {
         "大阪管区気象台" => Ok("04"),
         "福岡管区気象台" => Ok("05"),
         "沖縄気象台" => Ok("06"),
-        _ => Err(missing(format!(
-            "Control/EditorialOffice {office:?} has no Telegram section code"
-        ))),
+        _ => Err(unavailable(
+            "Control/EditorialOffice",
+            format!("Control/EditorialOffice {office:?} has no Telegram section code"),
+        )),
     }
 }
 
@@ -540,10 +606,15 @@ fn message_type(document: &EewXmlDocument) -> Result<&'static str, AppError> {
     }
 }
 
-fn telegram_time(time: &DateTime<FixedOffset>) -> String {
-    time.with_timezone(&jst())
-        .format("%y%m%d%H%M%S")
-        .to_string()
+fn telegram_time(time: &DateTime<FixedOffset>) -> Result<String, AppError> {
+    let time = time.with_timezone(&jst());
+    if !(2000..=2099).contains(&time.year()) {
+        return Err(unavailable(
+            "DateTime",
+            "JST year cannot be represented by the supported two-digit year convention (2000..2099)",
+        ));
+    }
+    Ok(time.format("%y%m%d%H%M%S").to_string())
 }
 
 fn jst() -> FixedOffset {
@@ -654,7 +725,7 @@ mod tests {
     }
 
     #[test]
-    fn zero_magnitude_calculation_count_is_preserved_in_rk() {
+    fn zero_magnitude_calculation_count_is_unknown_in_rk() {
         let xml = NOTO_FINAL.replace(
             "<NumberOfMagnitudeCalculation>5</NumberOfMagnitudeCalculation>",
             "<NumberOfMagnitudeCalculation>0</NumberOfMagnitudeCalculation>",
@@ -662,8 +733,8 @@ mod tests {
 
         let (telegram, _) = round_trip(&xml);
 
-        assert!(telegram.contains("RK44509"));
-        assert!(!telegram.contains("RK445/9"));
+        assert!(telegram.contains("RK445/9"));
+        assert!(!telegram.contains("RK44509"));
 
         // RC encoding must remain unchanged by this RK-only fix.
         assert!(telegram.contains("RC00///"));

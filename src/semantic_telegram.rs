@@ -205,7 +205,11 @@ pub fn parse_with_convention(
                     ..Intensity::default()
                 });
             }
-        } else if msg.Shindo != "//" || !msg.Ebis.is_empty() {
+        } else if msg.Shindo != "//"
+            || !msg.Ebis.is_empty()
+            || known(&msg.Rc1).is_some()
+            || known(&msg.Rc2).is_some()
+        {
             let mut regions = Vec::with_capacity(msg.Ebis.len());
             for e in &msg.Ebis {
                 let kind_code = format!("{}{}", e.Type, e.Arrive);

@@ -1,6 +1,7 @@
 //! Legacy encoder adapter; never used by the semantic parsing API.
-use chrono::{DateTime, Datelike, FixedOffset};
-use roxmltree::{Document, Node};
+use chrono::{DateTime, FixedOffset, Timelike};
+use roxmltree::{Document, Node, ParsingOptions};
+use std::{borrow::Cow, collections::HashSet};
 
 use crate::error::AppError;
 
@@ -10,7 +11,6 @@ use crate::xml::{NS_ELEMENT, NS_INFO, NS_REPORT, NS_SEIS};
 pub enum XmlProduct {
     Forecast,
     Warning,
-    Unknown,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -102,9 +102,16 @@ pub struct WarningAreas {
 }
 
 pub fn parse(xml: &str) -> Result<EewXmlDocument, AppError> {
-    let xml = xml.strip_prefix('\u{feff}').unwrap_or(xml);
+    let xml = xml.strip_prefix('\u{feff}').unwrap_or(xml).trim_start();
     crate::input::check_xml_depth(xml)?;
-    let document = Document::parse(xml).map_err(|error| AppError::InvalidXml(error.to_string()))?;
+    let document = Document::parse_with_options(
+        xml,
+        ParsingOptions {
+            nodes_limit: 250_000,
+            ..ParsingOptions::default()
+        },
+    )
+    .map_err(|error| AppError::InvalidXml(error.to_string()))?;
     let root = document.root_element();
     if root.tag_name().name() != "Report" || root.tag_name().namespace() != Some(NS_REPORT) {
         return Err(AppError::UnsupportedXml(
@@ -117,12 +124,8 @@ pub fn parse(xml: &str) -> Result<EewXmlDocument, AppError> {
     let body = required_child(root, NS_SEIS, "Body")?;
 
     let control_title = required_text(control, NS_REPORT, "Title")?;
-    let head_title = required_text(head, NS_INFO, "Title")?;
-    if control_title != head_title {
-        return Err(AppError::UnsupportedXml(format!(
-            "Control/Title {control_title:?} differs from Head/Title {head_title:?}"
-        )));
-    }
+    // Control identifies the product; Head/Title is its presentation title.
+    required_text(head, NS_INFO, "Title")?;
     let info_kind = required_text(head, NS_INFO, "InfoKind")?;
     if info_kind != "緊急地震速報" {
         return Err(AppError::UnsupportedXml(format!(
@@ -136,7 +139,7 @@ pub fn parse(xml: &str) -> Result<EewXmlDocument, AppError> {
         )));
     }
 
-    let info_type = match required_text(head, NS_INFO, "InfoType")? {
+    let info_type = match required_text(head, NS_INFO, "InfoType")?.as_ref() {
         "発表" => InfoType::Publication,
         "訂正" => InfoType::Correction,
         "取消" => InfoType::Cancellation,
@@ -146,23 +149,29 @@ pub fn parse(xml: &str) -> Result<EewXmlDocument, AppError> {
             )));
         }
     };
-    let (product, xml_type) = match head_title {
+    let (product, xml_type) = match control_title.as_ref() {
         "緊急地震速報（警報）" => (XmlProduct::Warning, "VXSE43"),
         "緊急地震速報（予報）" => (XmlProduct::Forecast, "VXSE44"),
         "緊急地震速報（地震動予報）" => (XmlProduct::Forecast, "VXSE45"),
-        _ if info_type == InfoType::Cancellation => (XmlProduct::Unknown, "unknown"),
         _ => {
             return Err(AppError::UnsupportedXml(format!(
-                "unsupported Head/Title {head_title:?}"
+                "unsupported Control/Title {control_title:?}"
             )));
         }
     };
     let serial = required_text(head, NS_INFO, "Serial")?
-        .parse::<u16>()
+        .parse::<u32>()
         .map_err(|_| missing("Head/Serial must be an integer"))?;
-    if serial == 0 || serial > 359 {
-        return Err(missing("Head/Serial must be in 1..=359"));
+    if serial == 0 {
+        return Err(missing("Head/Serial must be positive"));
     }
+    if serial > 359 {
+        return Err(unavailable(
+            "Head/Serial",
+            "serial cannot be represented in Telegram's 01..Z9 range",
+        ));
+    }
+    let serial = serial as u16;
 
     let event_id = required_text(head, NS_INFO, "EventID")?.to_string();
     if event_id.len() != 14 || !event_id.bytes().all(|byte| byte.is_ascii_digit()) {
@@ -170,7 +179,7 @@ pub fn parse(xml: &str) -> Result<EewXmlDocument, AppError> {
     }
 
     let control_time = parse_time(
-        required_text(control, NS_REPORT, "DateTime")?,
+        &required_text(control, NS_REPORT, "DateTime")?,
         "Control/DateTime",
     )?;
     let report_datetime = required_text(head, NS_INFO, "ReportDateTime")?.to_string();
@@ -208,11 +217,19 @@ pub fn parse(xml: &str) -> Result<EewXmlDocument, AppError> {
         });
     }
 
-    let earthquake_node = child(body, NS_SEIS, "Earthquake");
-    let forecast_node =
-        child(body, NS_SEIS, "Intensity").and_then(|node| child(node, NS_SEIS, "Forecast"));
+    let earthquake_node = child(body, NS_SEIS, "Earthquake")?;
+    let intensity_node = child(body, NS_SEIS, "Intensity")?;
+    if let Some(intensity) = intensity_node
+        && child(intensity, NS_SEIS, "Observation")?.is_some()
+    {
+        return Err(missing("Observation is only defined for VXSE47"));
+    }
+    let forecast_node = intensity_node
+        .map(|node| child(node, NS_SEIS, "Forecast"))
+        .transpose()?
+        .flatten();
     if info_type == InfoType::Cancellation {
-        if earthquake_node.is_some() || forecast_node.is_some() {
+        if earthquake_node.is_some() || intensity_node.is_some() {
             return Err(AppError::InvalidXml(
                 "a cancellation EEW must not contain Earthquake or Intensity/Forecast".to_string(),
             ));
@@ -222,12 +239,56 @@ pub fn parse(xml: &str) -> Result<EewXmlDocument, AppError> {
         return Err(missing("Body/Earthquake"));
     }
 
-    let earthquake = earthquake_node.map(parse_earthquake).transpose()?;
-    let forecast = forecast_node.map(parse_forecast).transpose()?;
-    let warning_areas = parse_warning_areas(head)?;
-    let final_report = child(body, NS_SEIS, "NextAdvisory")
-        .and_then(|node| node.text())
-        .is_some_and(|text| text.contains("最終報"));
+    let context = |error| match error {
+        AppError::Unsupported { field, reason, .. } => AppError::Unsupported {
+            event_id: Some(event_id.clone()),
+            xml_type: Some(xml_type.to_string()),
+            info_type: Some(info_type.as_xml_value().to_string()),
+            field,
+            reason,
+        },
+        other => other,
+    };
+    let earthquake = earthquake_node
+        .map(parse_earthquake)
+        .transpose()
+        .map_err(context)?;
+    let forecast = forecast_node
+        .map(parse_forecast)
+        .transpose()
+        .map_err(context)?;
+    if xml_type == "VXSE44"
+        && forecast.as_ref().is_some_and(|f| {
+            f._maximum_long_period.is_some()
+                || f._max_long_period_change.is_some()
+                || f.areas.iter().any(|a| a._long_period.is_some())
+        })
+    {
+        return Err(missing(
+            "ForecastLgInt/MaxLgIntChange are only defined for VXSE43/VXSE45",
+        ));
+    }
+    if earthquake
+        .as_ref()
+        .is_some_and(|eq| eq.coordinate.depth_km.is_some_and(|d| d > 150))
+        && forecast.as_ref().is_some_and(|f| {
+            f._maximum_long_period.is_some() || f.areas.iter().any(|a| a._long_period.is_some())
+        })
+    {
+        return Err(missing(
+            "ForecastLgInt is not defined for hypocenters deeper than 150 km",
+        ));
+    }
+    let warning_areas = parse_warning_areas(head).map_err(context)?;
+    let final_report = match optional_text(body, NS_SEIS, "NextAdvisory")?.as_deref() {
+        None => false,
+        Some("この情報をもって、緊急地震速報：最終報とします。") => true,
+        Some(_) => {
+            return Err(missing(
+                "Body/NextAdvisory must use the official final-report text",
+            ));
+        }
+    };
 
     Ok(EewXmlDocument {
         product,
@@ -268,17 +329,21 @@ impl EewXmlDocument {
 }
 
 fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
-    let origin_time = child(node, NS_SEIS, "OriginTime")
-        .and_then(|node| node.text())
-        .map(|value| parse_time(value, "Body/Earthquake/OriginTime"))
+    let origin_time = optional_text(node, NS_SEIS, "OriginTime")?
+        .map(|value| parse_time(&value, "Body/Earthquake/OriginTime"))
         .transpose()?;
     let arrival_time = parse_time(
-        required_text(node, NS_SEIS, "ArrivalTime")?,
+        &required_text(node, NS_SEIS, "ArrivalTime")?,
         "Body/Earthquake/ArrivalTime",
     )?;
-    let assumed_hypocenter = child(node, NS_SEIS, "Condition")
-        .and_then(|node| node.text())
-        .is_some_and(|condition| condition == "仮定震源要素");
+    let assumed_hypocenter = match optional_text(node, NS_SEIS, "Condition")?.as_deref() {
+        None => false,
+        Some("仮定震源要素") => true,
+        Some(_) => return Err(missing("Earthquake/Condition must be 仮定震源要素")),
+    };
+    if assumed_hypocenter && origin_time.is_none() {
+        return Err(missing("an assumed hypocenter requires OriginTime"));
+    }
 
     let hypocenter = required_child(node, NS_SEIS, "Hypocenter")?;
     let area = required_child(hypocenter, NS_SEIS, "Area")?;
@@ -288,9 +353,7 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
             "Body/Earthquake/Hypocenter/Area/Code must be 3 digits",
         ));
     }
-    let reduced_epicenter_code = child(area, NS_SEIS, "ReduceCode")
-        .and_then(|node| node.text())
-        .map(str::to_string);
+    let reduced_epicenter_code = optional_text(area, NS_SEIS, "ReduceCode")?.map(Cow::into_owned);
     if reduced_epicenter_code
         .as_deref()
         .is_some_and(|code| code.len() != 4 || !code.bytes().all(|byte| byte.is_ascii_digit()))
@@ -299,12 +362,10 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
             "Body/Earthquake/Hypocenter/Area/ReduceCode must be 4 digits",
         ));
     }
-    let coordinate = child(area, NS_ELEMENT, "Coordinate")
+    let coordinate = child(area, NS_ELEMENT, "Coordinate")?
         .ok_or_else(|| missing("Body/Earthquake/Hypocenter/Area/Coordinate"))?;
-    let coordinate = parse_coordinate(coordinate.text().unwrap_or_default())?;
-    let land_or_sea = child(area, NS_SEIS, "LandOrSea")
-        .and_then(|node| node.text())
-        .map(str::to_string);
+    let coordinate = parse_coordinate(&scalar_text(coordinate, "Coordinate")?)?;
+    let land_or_sea = optional_text(area, NS_SEIS, "LandOrSea")?.map(Cow::into_owned);
     if land_or_sea
         .as_deref()
         .is_some_and(|value| !matches!(value, "内陸" | "海域"))
@@ -316,6 +377,13 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
     let epicenter = required_child(accuracy, NS_SEIS, "Epicenter")?;
     let depth = required_child(accuracy, NS_SEIS, "Depth")?;
     let magnitude_calculation = required_child(accuracy, NS_SEIS, "MagnitudeCalculation")?;
+    for rank in [epicenter, depth, magnitude_calculation] {
+        if scalar_text(rank, "Accuracy")? != "NaN" {
+            return Err(missing(
+                "Accuracy quantities must contain NaN; the rank is an attribute",
+            ));
+        }
+    }
     let accuracy = Accuracy {
         epicenter_rank: parse_attribute_u8(epicenter, "rank", "Accuracy/Epicenter/@rank")?,
         epicenter_rank2: parse_attribute_u8(epicenter, "rank2", "Accuracy/Epicenter/@rank2")?,
@@ -340,9 +408,20 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
         ));
     }
 
-    let magnitude =
-        child(node, NS_ELEMENT, "Magnitude").ok_or_else(|| missing("Body/Earthquake/Magnitude"))?;
-    let magnitude = match magnitude.text().unwrap_or_default().trim() {
+    let magnitude = child(node, NS_ELEMENT, "Magnitude")?
+        .ok_or_else(|| missing("Body/Earthquake/Magnitude"))?;
+    if magnitude
+        .attribute("type")
+        .ok_or_else(|| missing("Magnitude/@type"))?
+        != "Mj"
+    {
+        return Err(unavailable(
+            "Earthquake/Magnitude/@type",
+            "only Mj has a verified mapping to the Telegram magnitude field",
+        ));
+    }
+    let magnitude_condition = magnitude.attribute("condition");
+    let magnitude = match scalar_text(magnitude, "Magnitude")?.as_ref() {
         "NaN" | "" => None,
         value => Some(
             value
@@ -350,6 +429,16 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
                 .map_err(|_| missing("Body/Earthquake/Magnitude"))?,
         ),
     };
+    if magnitude.is_some_and(|value| !value.is_finite()) {
+        return Err(missing(
+            "Magnitude must be finite or the explicit unknown NaN",
+        ));
+    }
+    if magnitude_condition.is_some_and(|condition| condition != "不明" || magnitude.is_some()) {
+        return Err(missing(
+            "Magnitude/@condition must indicate 不明 only for an unknown magnitude",
+        ));
+    }
     if assumed_hypocenter
         && (coordinate.depth_km != Some(10)
             || land_or_sea.is_some()
@@ -358,7 +447,9 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
             || !matches!(accuracy.epicenter_rank2, 1 | 9)
             || accuracy.depth_rank != 1
             || accuracy.magnitude_rank != 8
-            || accuracy.magnitude_stations != 1)
+            // 0 is unknown, not zero stations. This internal-use field can
+            // change without notice (JMA XML II.21, 1-4-2-4).
+            || !matches!(accuracy.magnitude_stations, 0 | 1))
     {
         return Err(missing(
             "an assumed hypocenter must use the official depth, magnitude, land/sea, and accuracy values",
@@ -380,19 +471,34 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
 
 fn parse_forecast(node: Node<'_, '_>) -> Result<Forecast, AppError> {
     let mut result = Forecast {
-        maximum_intensity: child(node, NS_SEIS, "ForecastInt")
-            .map(parse_intensity)
-            .transpose()?,
-        _maximum_long_period: child(node, NS_SEIS, "ForecastLgInt")
+        maximum_intensity: Some(parse_intensity(required_child(
+            node,
+            NS_SEIS,
+            "ForecastInt",
+        )?)?),
+        _maximum_long_period: child(node, NS_SEIS, "ForecastLgInt")?
             .map(parse_long_period)
             .transpose()?,
         ..Forecast::default()
     };
 
-    if let Some(appendix) = child(node, NS_SEIS, "Appendix") {
-        result.max_int_change = optional_u8(appendix, "MaxIntChange")?;
+    if let Some(appendix) = child(node, NS_SEIS, "Appendix")? {
+        result.max_int_change = Some(
+            required_text(appendix, NS_SEIS, "MaxIntChange")?
+                .parse()
+                .map_err(|_| missing("Appendix/MaxIntChange"))?,
+        );
         result._max_long_period_change = optional_u8(appendix, "MaxLgIntChange")?;
-        result.max_int_change_reason = optional_u8(appendix, "MaxIntChangeReason")?;
+        if result._maximum_long_period.is_some() != result._max_long_period_change.is_some() {
+            return Err(missing(
+                "Appendix/MaxLgIntChange must accompany ForecastLgInt",
+            ));
+        }
+        result.max_int_change_reason = Some(
+            required_text(appendix, NS_SEIS, "MaxIntChangeReason")?
+                .parse()
+                .map_err(|_| missing("Appendix/MaxIntChangeReason"))?,
+        );
         if result.max_int_change.is_some_and(|value| value > 2)
             || result
                 ._max_long_period_change
@@ -405,35 +511,53 @@ fn parse_forecast(node: Node<'_, '_>) -> Result<Forecast, AppError> {
         }
     }
 
+    let mut area_codes = HashSet::new();
     for pref in children(node, NS_SEIS, "Pref") {
         for area in children(pref, NS_SEIS, "Area") {
             let category = required_child(area, NS_SEIS, "Category")?;
             let kind = required_child(category, NS_SEIS, "Kind")?;
             let kind_code = required_text(kind, NS_SEIS, "Code")?.to_string();
-            if kind_code.len() != 2 || !kind_code.bytes().all(|byte| byte.is_ascii_digit()) {
+            if !matches!(kind_code.as_str(), "00" | "01" | "09" | "10" | "11" | "19") {
                 return Err(missing(
-                    "Forecast/Pref/Area/Category/Kind/Code must be 2 digits",
+                    "Forecast/Pref/Area/Category/Kind/Code must be 00, 01, 09, 10, 11, or 19",
                 ));
             }
             let code = required_text(area, NS_SEIS, "Code")?.to_string();
             if code.len() != 3 || !code.bytes().all(|byte| byte.is_ascii_digit()) {
                 return Err(missing("Forecast/Pref/Area/Code must be 3 digits"));
             }
-            result.areas.push(ForecastArea {
+            if !area_codes.insert(required_text(area, NS_SEIS, "Code")?) {
+                return Err(missing("Forecast contains duplicate area codes"));
+            }
+            let forecast_area = ForecastArea {
                 code,
                 kind_code,
                 intensity: parse_intensity(required_child(area, NS_SEIS, "ForecastInt")?)?,
-                _long_period: child(area, NS_SEIS, "ForecastLgInt")
+                _long_period: child(area, NS_SEIS, "ForecastLgInt")?
                     .map(parse_long_period)
                     .transpose()?,
-                arrival_time: child(area, NS_SEIS, "ArrivalTime")
-                    .and_then(|node| node.text())
-                    .map(|value| parse_time(value, "Forecast/Pref/Area/ArrivalTime"))
+                arrival_time: optional_text(area, NS_SEIS, "ArrivalTime")?
+                    .map(|value| parse_time(&value, "Forecast/Pref/Area/ArrivalTime"))
                     .transpose()?,
-                condition: child(area, NS_SEIS, "Condition")
-                    .and_then(|node| node.text())
-                    .map(str::to_string),
-            });
+                condition: optional_text(area, NS_SEIS, "Condition")?.map(Cow::into_owned),
+            };
+            // Validate every area, including low-intensity LPGM areas that
+            // will be omitted from the legacy EBI projection.
+            let arrived = forecast_area.kind_code.ends_with('1');
+            if arrived {
+                if forecast_area.arrival_time.is_some()
+                    || forecast_area.condition.as_deref() != Some("既に主要動到達と推測")
+                {
+                    return Err(missing(
+                        "arrived area requires Condition and no ArrivalTime",
+                    ));
+                }
+            } else if forecast_area.arrival_time.is_none() || forecast_area.condition.is_some() {
+                return Err(missing(
+                    "unarrived/PLUM area requires ArrivalTime and no Condition",
+                ));
+            }
+            result.areas.push(forecast_area);
         }
     }
     Ok(result)
@@ -499,18 +623,32 @@ fn intensity_rank(value: &str) -> u8 {
 
 fn parse_warning_areas(head: Node<'_, '_>) -> Result<WarningAreas, AppError> {
     let mut result = WarningAreas::default();
-    let Some(headline) = child(head, NS_INFO, "Headline") else {
+    let Some(headline) = child(head, NS_INFO, "Headline")? else {
         return Ok(result);
     };
     for information in children(headline, NS_INFO, "Information") {
         let area_type = information.attribute("type").unwrap_or_default();
+        if !matches!(
+            area_type,
+            "緊急地震速報（地方予報区）"
+                | "緊急地震速報（府県予報区）"
+                | "緊急地震速報（細分区域）"
+        ) {
+            continue;
+        }
         for item in children(information, NS_INFO, "Item") {
             let kind = required_child(item, NS_INFO, "Kind")?;
-            if required_text(kind, NS_INFO, "Code")? != "31" {
-                continue;
+            match required_text(kind, NS_INFO, "Code")?.as_ref() {
+                "00" => continue,
+                "31" => {}
+                _ => return Err(missing("Headline/Kind/Code must be 00 or 31")),
             }
             let last_kind = required_child(item, NS_INFO, "LastKind")?;
-            let is_added = required_text(last_kind, NS_INFO, "Code")? == "00";
+            let is_added = match required_text(last_kind, NS_INFO, "Code")?.as_ref() {
+                "00" => true,
+                "31" => false,
+                _ => return Err(missing("Headline/LastKind/Code must be 00 or 31")),
+            };
             let areas = required_child(item, NS_INFO, "Areas")?;
             for area in children(areas, NS_INFO, "Area") {
                 let code = required_text(area, NS_INFO, "Code")?.to_string();
@@ -536,6 +674,9 @@ fn parse_warning_areas(head: Node<'_, '_>) -> Result<WarningAreas, AppError> {
                         "Headline/Information/Areas/Area/Code has invalid width",
                     ));
                 }
+                if current.contains(&code) {
+                    return Err(missing("Headline contains duplicate warning area codes"));
+                }
                 current.push(code.clone());
                 if is_added {
                     added.push(code);
@@ -547,12 +688,16 @@ fn parse_warning_areas(head: Node<'_, '_>) -> Result<WarningAreas, AppError> {
 }
 
 fn parse_coordinate(value: &str) -> Result<Coordinate, AppError> {
-    let value = value.trim().strip_suffix('/').unwrap_or(value.trim());
-    if value.is_empty() {
-        return Err(missing(
-            "Coordinate is empty (all hypocenter elements are unknown)",
+    let value = value.trim();
+    if value.is_empty() || value == "/" {
+        return Err(unavailable(
+            "Earthquake/Hypocenter/Area/Coordinate",
+            "all coordinates are unknown; the code specification defines unset latitude/longitude for cancellation only",
         ));
     }
+    let value = value
+        .strip_suffix('/')
+        .ok_or_else(|| missing("Coordinate requires ISO 6709 terminal /"))?;
     if !value.is_ascii() || !matches!(value.as_bytes().first(), Some(b'+' | b'-')) {
         return Err(missing(
             "Coordinate must use the ISO 6709 signed ASCII form",
@@ -613,10 +758,11 @@ fn parse_coordinate(value: &str) -> Result<Coordinate, AppError> {
 fn parse_time(value: &str, field: &str) -> Result<DateTime<FixedOffset>, AppError> {
     let time = DateTime::parse_from_rfc3339(value)
         .map_err(|_| missing(format!("{field} must be RFC 3339")))?;
-    if !(2000..=2099).contains(&time.year()) {
-        return Err(missing(format!(
-            "{field} year cannot be represented by Telegram's two-digit year"
-        )));
+    if time.nanosecond() != 0 {
+        return Err(unavailable(
+            field,
+            "subsecond precision cannot be represented in Telegram",
+        ));
     }
     Ok(time)
 }
@@ -624,13 +770,13 @@ fn parse_time(value: &str, field: &str) -> Result<DateTime<FixedOffset>, AppErro
 fn parse_attribute_u8(node: Node<'_, '_>, attribute: &str, field: &str) -> Result<u8, AppError> {
     node.attribute(attribute)
         .ok_or_else(|| missing(field))?
+        .trim()
         .parse()
         .map_err(|_| missing(field))
 }
 
 fn optional_u8(node: Node<'_, '_>, name: &str) -> Result<Option<u8>, AppError> {
-    child(node, NS_SEIS, name)
-        .and_then(|node| node.text())
+    optional_text(node, NS_SEIS, name)?
         .map(|value| {
             let value = value
                 .parse()
@@ -647,12 +793,17 @@ fn child<'a, 'input>(
     node: Node<'a, 'input>,
     namespace: &str,
     name: &str,
-) -> Option<Node<'a, 'input>> {
-    node.children().find(|child| {
+) -> Result<Option<Node<'a, 'input>>, AppError> {
+    let mut nodes = node.children().filter(|child| {
         child.is_element()
             && child.tag_name().namespace() == Some(namespace)
             && child.tag_name().name() == name
-    })
+    });
+    let first = nodes.next();
+    if nodes.next().is_some() {
+        return Err(AppError::InvalidXml(format!("duplicate {name} element")));
+    }
+    Ok(first)
 }
 
 fn children<'a, 'input>(
@@ -672,15 +823,53 @@ fn required_child<'a, 'input>(
     namespace: &str,
     name: &str,
 ) -> Result<Node<'a, 'input>, AppError> {
-    child(node, namespace, name).ok_or_else(|| missing(name))
+    child(node, namespace, name)?.ok_or_else(|| missing(name))
 }
 
-fn required_text<'a>(node: Node<'a, '_>, namespace: &str, name: &str) -> Result<&'a str, AppError> {
-    child(node, namespace, name)
-        .and_then(|node| node.text())
-        .map(str::trim)
-        .filter(|text| !text.is_empty())
-        .ok_or_else(|| missing(name))
+fn required_text<'a>(
+    node: Node<'a, '_>,
+    namespace: &str,
+    name: &str,
+) -> Result<Cow<'a, str>, AppError> {
+    optional_text(node, namespace, name)?.ok_or_else(|| missing(name))
+}
+
+fn optional_text<'a>(
+    node: Node<'a, '_>,
+    namespace: &str,
+    name: &str,
+) -> Result<Option<Cow<'a, str>>, AppError> {
+    child(node, namespace, name)?
+        .map(|node| leaf_text(node, name))
+        .transpose()
+}
+
+fn leaf_text<'a>(node: Node<'a, '_>, name: &str) -> Result<Cow<'a, str>, AppError> {
+    let text = scalar_text(node, name)?;
+    if text.is_empty() {
+        return Err(missing(name));
+    }
+    Ok(text)
+}
+
+fn scalar_text<'a>(node: Node<'a, '_>, name: &str) -> Result<Cow<'a, str>, AppError> {
+    if node.children().any(|n| n.is_element()) {
+        return Err(missing(format!("{name} must contain simple text")));
+    }
+    Ok(match crate::xml::scalar_text(node) {
+        Cow::Borrowed(s) => Cow::Borrowed(s.trim()),
+        Cow::Owned(s) => Cow::Owned(s.trim().to_owned()),
+    })
+}
+
+pub(crate) fn unavailable(field: impl Into<String>, reason: impl Into<String>) -> AppError {
+    AppError::Unsupported {
+        event_id: None,
+        xml_type: None,
+        info_type: None,
+        field: Some(field.into()),
+        reason: reason.into(),
+    }
 }
 
 fn missing(field: impl Into<String>) -> AppError {

@@ -1,4 +1,4 @@
-use eew_parser::parse_auto;
+use eew_parser::{encode_xml_as_telegram, parse_auto};
 use std::{hint::black_box, time::Instant};
 
 fn measure(name: &str, bytes: &[u8], json: bool) {
@@ -58,5 +58,43 @@ fn main() {
         "large_xml_json",
         include_bytes!("../tests/fixtures/official_noto_final.xml"),
         true,
+    );
+    for (name, bytes) in [
+        (
+            "encode_small_xml",
+            include_bytes!("../tests/fixtures/official_100gal_first.xml").as_slice(),
+        ),
+        (
+            "encode_large_xml",
+            include_bytes!("../tests/fixtures/official_noto_final.xml").as_slice(),
+        ),
+        (
+            "encode_ordinary_xml",
+            include_bytes!("../tests/fixtures/production_20261106/20261106193937-11.xml")
+                .as_slice(),
+        ),
+    ] {
+        measure_encoder(name, bytes);
+    }
+}
+
+fn measure_encoder(name: &str, bytes: &[u8]) {
+    let samples = if cfg!(debug_assertions) { 100 } else { 10_000 };
+    for _ in 0..samples / 20 {
+        black_box(encode_xml_as_telegram(black_box(bytes)).unwrap());
+    }
+    let mut ns = Vec::with_capacity(samples);
+    for _ in 0..samples {
+        let start = Instant::now();
+        black_box(encode_xml_as_telegram(black_box(bytes)).unwrap());
+        ns.push(start.elapsed().as_nanos());
+    }
+    ns.sort_unstable();
+    println!(
+        "{name},{},{},{},{}",
+        bytes.len(),
+        ns[samples / 2],
+        ns[samples * 95 / 100],
+        ns[samples * 99 / 100]
     );
 }

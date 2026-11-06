@@ -1,0 +1,205 @@
+{
+  "source_archive": "jma_eew_1106.zip",
+  "source_log": "jmaapi_rCURRENT.log",
+  "extraction": "JSON string decoded to original UTF-8 bytes; no XML serialization",
+  "samples": [
+    {
+      "file": "20261106030553-01.xml",
+      "event_id": "20261106030553",
+      "serial": 1,
+      "bytes": 1876,
+      "log_declared_bytes": 1876,
+      "sha256": "a5815e8373b9a6c9b2e11bcfb18e0df053454b401e62f720381277c5dd55fe25",
+      "log_line": 39
+    },
+    {
+      "file": "20261106030553-02.xml",
+      "event_id": "20261106030553",
+      "serial": 2,
+      "bytes": 2003,
+      "log_declared_bytes": 2003,
+      "sha256": "f0c20650810d431e67fc0913e0cbce7142d301e24f0de5ee758a6261fd921181",
+      "log_line": 53
+    },
+    {
+      "file": "20261106030553-03.xml",
+      "event_id": "20261106030553",
+      "serial": 3,
+      "bytes": 2003,
+      "log_declared_bytes": 2003,
+      "sha256": "0f8b6296206fb0be6a1b27607423318beedc09e884d6735f6c192aac80733c88",
+      "log_line": 59
+    },
+    {
+      "file": "20261106030553-04.xml",
+      "event_id": "20261106030553",
+      "serial": 4,
+      "bytes": 2003,
+      "log_declared_bytes": 2003,
+      "sha256": "2f99034d27c9c7501fe26e0d7ce4b41d0059a76487bf48ac7efe2862f928877e",
+      "log_line": 73
+    },
+    {
+      "file": "20261106030553-05.xml",
+      "event_id": "20261106030553",
+      "serial": 5,
+      "bytes": 2003,
+      "log_declared_bytes": 2003,
+      "sha256": "9b133c9afde1e1aa36c4d2cdfa05457264927f99c43356cb35fee7baa96db0e3",
+      "log_line": 85
+    },
+    {
+      "file": "20261106030553-06.xml",
+      "event_id": "20261106030553",
+      "serial": 6,
+      "bytes": 2104,
+      "log_declared_bytes": 2104,
+      "sha256": "b9be95452f7f9b6505fdf6274dbfa241ab5ece11076d2bea7bd967af517016da",
+      "log_line": 97
+    },
+    {
+      "file": "20261106193937-01.xml",
+      "event_id": "20261106193937",
+      "serial": 1,
+      "bytes": 1885,
+      "log_declared_bytes": 1885,
+      "sha256": "c4c5037f2ffb865f4adc80d13e1c54db7437029eee041b2e48d29a4e7a103412",
+      "log_line": 317
+    },
+    {
+      "file": "20261106193937-02.xml",
+      "event_id": "20261106193937",
+      "serial": 2,
+      "bytes": 2012,
+      "log_declared_bytes": 2012,
+      "sha256": "5125fc197f00d7ec226e7d26f8a3585a1cde643e41bcc64ae09bec162d558985",
+      "log_line": 323
+    },
+    {
+      "file": "20261106193937-03.xml",
+      "event_id": "20261106193937",
+      "serial": 3,
+      "bytes": 2012,
+      "log_declared_bytes": 2012,
+      "sha256": "9317272695d811e2cb1a1a4fc5e3426e205ea2a3da87261c1c573206f2b6feea",
+      "log_line": 339
+    },
+    {
+      "file": "20261106193937-04.xml",
+      "event_id": "20261106193937",
+      "serial": 4,
+      "bytes": 2012,
+      "log_declared_bytes": 2012,
+      "sha256": "26fd9eed4f278a5779f3cc61d1653d44aa738b6226bf63cbe9448454399da3c2",
+      "log_line": 345
+    },
+    {
+      "file": "20261106193937-05.xml",
+      "event_id": "20261106193937",
+      "serial": 5,
+      "bytes": 2012,
+      "log_declared_bytes": 2012,
+      "sha256": "606034aab28893d7a26fc40eefc3affd841cfad0a7cf2476de7ec1a3bf65fa39",
+      "log_line": 349
+    },
+    {
+      "file": "20261106193937-06.xml",
+      "event_id": "20261106193937",
+      "serial": 6,
+      "bytes": 2012,
+      "log_declared_bytes": 2012,
+      "sha256": "c9de60c79f70859ff433eed1acd8a271b4bfb51baad434a9a418cce304f8f971",
+      "log_line": 353
+    },
+    {
+      "file": "20261106193937-07.xml",
+      "event_id": "20261106193937",
+      "serial": 7,
+      "bytes": 2012,
+      "log_declared_bytes": 2012,
+      "sha256": "8a7157af635321b13c6ea51fea7b48b62f799a264f492a246d9cb2a2f5839092",
+      "log_line": 375
+    },
+    {
+      "file": "20261106193937-08.xml",
+      "event_id": "20261106193937",
+      "serial": 8,
+      "bytes": 2012,
+      "log_declared_bytes": 2012,
+      "sha256": "e49b70a80a6d10742cf460f9598c721c2031060954981d4e19867c5498d41d08",
+      "log_line": 387
+    },
+    {
+      "file": "20261106193937-09.xml",
+      "event_id": "20261106193937",
+      "serial": 9,
+      "bytes": 2012,
+      "log_declared_bytes": 2012,
+      "sha256": "52fec48e374245814d52ac7d7928755c99a4eacf4549cc38dfd83544f42418c1",
+      "log_line": 399
+    },
+    {
+      "file": "20261106193937-10.xml",
+      "event_id": "20261106193937",
+      "serial": 10,
+      "bytes": 2013,
+      "log_declared_bytes": 2013,
+      "sha256": "0445bf4e4551aa581adb7117c31fd69028ce6feeaa481c847da6bc07718ecae5",
+      "log_line": 411
+    },
+    {
+      "file": "20261106193937-11.xml",
+      "event_id": "20261106193937",
+      "serial": 11,
+      "bytes": 2114,
+      "log_declared_bytes": 2114,
+      "sha256": "f3e0782456c46f044cecf102c0d873d5623ccbb4ddbc1ec6e453ecaba3eb8c09",
+      "log_line": 455
+    },
+    {
+      "file": "20261106194044-01.xml",
+      "event_id": "20261106194044",
+      "serial": 1,
+      "bytes": 1842,
+      "log_declared_bytes": 1842,
+      "sha256": "8cfe0c703508355b89e3faa915936445d440e85cea97f6ca670277400baacb2f",
+      "log_line": 423
+    },
+    {
+      "file": "20261106194044-02.xml",
+      "event_id": "20261106194044",
+      "serial": 2,
+      "bytes": 2465,
+      "log_declared_bytes": 2465,
+      "sha256": "d70f937c4917c44e9aa33b82f6b7b3223adebd34105b54c48f4465a964043b2a",
+      "log_line": 431
+    },
+    {
+      "file": "20261106194044-03.xml",
+      "event_id": "20261106194044",
+      "serial": 3,
+      "bytes": 2465,
+      "log_declared_bytes": 2465,
+      "sha256": "bf6d6395ac68a9841138ad6f9f22732149fcb28b17b663888f965f32ae012d96",
+      "log_line": 437
+    },
+    {
+      "file": "20261106194044-04.xml",
+      "event_id": "20261106194044",
+      "serial": 4,
+      "bytes": 2465,
+      "log_declared_bytes": 2465,
+      "sha256": "9d41c599052c40964c12e37240ba3b712a251e50c98bb9660439869084a7b40b",
+      "log_line": 471
+    },
+    {
+      "file": "20261106194044-05.xml",
+      "event_id": "20261106194044",
+      "serial": 5,
+      "bytes": 2566,
+      "log_declared_bytes": 2566,
+      "sha256": "66bc4245dd567366a175ab3a3ac15c509a2021f5a52fc08017f39a500bac2a31",
+      "log_line": 487
+    }
+  ]
+}
