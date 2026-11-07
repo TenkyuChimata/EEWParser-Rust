@@ -108,7 +108,7 @@ fn full_observed_sequence_tracker_accepts_same_second_distinct_serials_and_late_
     assert_eq!(tracker.observe(&all[36]), EventDecision::AfterCancellation);
 }
 #[test]
-fn actual_cancel_telegram_and_observed_json_share_lifecycle_identity() {
+fn actual_cancel_telegram_does_not_guess_which_xml_product_to_cancel() {
     let all = observed();
     let cancel=parse_telegram(b"39 03 10 261016124850 C11 261016123810 ND20261016123810 NCN037 JD////////////// JN/// /// //// ///// /// // // RK///// RT///// RC///// 9999=").unwrap();
     let mut tracker = EventTracker::new();
@@ -116,15 +116,21 @@ fn actual_cancel_telegram_and_observed_json_share_lifecycle_identity() {
     assert_eq!(tracker.observe(&all[41]), EventDecision::Final);
     assert_eq!(
         tracker.observe(&cancel),
-        EventDecision::Cancelled { existed: true }
+        EventDecision::Cancelled { existed: false }
     );
     assert_eq!(
         tracker
             .state(&EventTracker::key(&cancel).unwrap())
             .unwrap()
             .latest_serial,
-        Some(42)
+        None
     );
+    let xml_state = tracker
+        .state(&EventTracker::key(&all[41]).unwrap())
+        .unwrap();
+    assert_eq!(xml_state.latest_serial, Some(42));
+    assert!(!xml_state.is_cancelled);
+    assert_eq!(tracker.len(), 2);
     assert_eq!(cancel.message_time(), all[42].message_time());
     assert_eq!(cancel.serial(), all[42].serial());
     assert_eq!(cancel.is_last_info(), all[42].is_last_info());

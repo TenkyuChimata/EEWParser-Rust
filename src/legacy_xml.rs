@@ -347,6 +347,8 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
 
     let hypocenter = required_child(node, NS_SEIS, "Hypocenter")?;
     let area = required_child(hypocenter, NS_SEIS, "Area")?;
+    required_text(area, NS_SEIS, "Name")?;
+    required_text(area, NS_SEIS, "ReduceName")?;
     let epicenter_code = required_text(area, NS_SEIS, "Code")?.to_string();
     if epicenter_code.len() != 3 || !epicenter_code.bytes().all(|byte| byte.is_ascii_digit()) {
         return Err(missing(
@@ -410,19 +412,16 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
 
     let magnitude = child(node, NS_ELEMENT, "Magnitude")?
         .ok_or_else(|| missing("Body/Earthquake/Magnitude"))?;
-    if magnitude
-        .attribute("type")
-        .ok_or_else(|| missing("Magnitude/@type"))?
-        != "Mj"
-    {
+    if crate::xml::attribute(magnitude, "type").ok_or_else(|| missing("Magnitude/@type"))? != "Mj" {
         return Err(unavailable(
             "Earthquake/Magnitude/@type",
             "only Mj has a verified mapping to the Telegram magnitude field",
         ));
     }
-    let magnitude_condition = magnitude.attribute("condition");
-    let magnitude = match scalar_text(magnitude, "Magnitude")?.as_ref() {
-        "NaN" | "" => None,
+    let magnitude_condition = crate::xml::attribute(magnitude, "condition");
+    let magnitude_text = scalar_text(magnitude, "Magnitude")?;
+    let magnitude = match magnitude_text.as_ref() {
+        "NaN" => None,
         value => Some(
             value
                 .parse::<f64>()
@@ -432,6 +431,12 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
     if magnitude.is_some_and(|value| !value.is_finite()) {
         return Err(missing(
             "Magnitude must be finite or the explicit unknown NaN",
+        ));
+    }
+    if magnitude.is_some() && !has_tenths_precision(&magnitude_text) {
+        return Err(unavailable(
+            "Magnitude",
+            "magnitude exceeds Telegram's one-decimal precision",
         ));
     }
     if magnitude_condition.is_some_and(|condition| condition != "不明" || magnitude.is_some()) {
@@ -470,6 +475,7 @@ fn parse_earthquake(node: Node<'_, '_>) -> Result<Earthquake, AppError> {
 }
 
 fn parse_forecast(node: Node<'_, '_>) -> Result<Forecast, AppError> {
+    crate::xml::validate_code_definitions(node, false)?;
     let mut result = Forecast {
         maximum_intensity: Some(parse_intensity(required_child(
             node,
@@ -627,7 +633,7 @@ fn parse_warning_areas(head: Node<'_, '_>) -> Result<WarningAreas, AppError> {
         return Ok(result);
     };
     for information in children(headline, NS_INFO, "Information") {
-        let area_type = information.attribute("type").unwrap_or_default();
+        let area_type = crate::xml::attribute(information, "type").unwrap_or_default();
         if !matches!(
             area_type,
             "緊急地震速報（地方予報区）"
@@ -710,19 +716,27 @@ fn parse_coordinate(value: &str) -> Result<Coordinate, AppError> {
     let third = value[second + 1..]
         .find(['+', '-'])
         .map(|index| second + 1 + index);
-    let latitude = value[..second]
-        .parse::<f64>()
-        .map_err(|_| missing("Coordinate latitude"))?;
+    let latitude = crate::xml::coordinate_number(&value[..second], "Coordinate latitude")?;
     let longitude_end = third.unwrap_or(value.len());
-    let longitude = value[second..longitude_end]
-        .parse::<f64>()
-        .map_err(|_| missing("Coordinate longitude"))?;
+    let longitude =
+        crate::xml::coordinate_number(&value[second..longitude_end], "Coordinate longitude")?;
     if !latitude.is_finite()
         || !longitude.is_finite()
-        || latitude.abs() > 90.0
-        || longitude.abs() > 180.0
+        || !crate::xml::coordinate_within_bound(&value[..second], 90)
+        || !crate::xml::coordinate_within_bound(&value[second..longitude_end], 180)
     {
         return Err(missing("Coordinate latitude or longitude is out of range"));
+    }
+    for (raw, field) in [
+        (&value[..second], "latitude"),
+        (&value[second..longitude_end], "longitude"),
+    ] {
+        if !has_tenths_precision(raw) {
+            return Err(unavailable(
+                field,
+                format!("{field} exceeds Telegram's one-decimal precision"),
+            ));
+        }
     }
     let depth_km = third
         .map(|index| {
@@ -755,6 +769,32 @@ fn parse_coordinate(value: &str) -> Result<Coordinate, AppError> {
     })
 }
 
+// Decide representability from the XML decimal, before f64 can erase low
+// digits. Scientific notation is legal for xs:float Magnitude. Zero remains
+// exactly representable regardless of the spelling of its exponent.
+fn has_tenths_precision(raw: &str) -> bool {
+    let (mantissa, exponent) = raw.split_once(['e', 'E']).unwrap_or((raw, "0"));
+    let mut digits = mantissa.bytes().filter(u8::is_ascii_digit).rev();
+    let mut trailing_zeroes = 0i64;
+    let mut nonzero = false;
+    for digit in &mut digits {
+        if digit != b'0' {
+            nonzero = true;
+            break;
+        }
+        trailing_zeroes += 1;
+    }
+    if !nonzero {
+        return true;
+    }
+    let Ok(exponent) = exponent.parse::<i64>() else {
+        return false;
+    };
+    let fractional_digits = mantissa.split_once('.').map_or(0, |(_, f)| f.len()) as i64;
+    // i128 avoids overflow for otherwise valid, extremely large exponents.
+    i128::from(fractional_digits) - i128::from(exponent) - i128::from(trailing_zeroes) <= 1
+}
+
 fn parse_time(value: &str, field: &str) -> Result<DateTime<FixedOffset>, AppError> {
     let time = DateTime::parse_from_rfc3339(value)
         .map_err(|_| missing(format!("{field} must be RFC 3339")))?;
@@ -768,7 +808,7 @@ fn parse_time(value: &str, field: &str) -> Result<DateTime<FixedOffset>, AppErro
 }
 
 fn parse_attribute_u8(node: Node<'_, '_>, attribute: &str, field: &str) -> Result<u8, AppError> {
-    node.attribute(attribute)
+    crate::xml::attribute(node, attribute)
         .ok_or_else(|| missing(field))?
         .trim()
         .parse()

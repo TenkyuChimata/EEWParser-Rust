@@ -8,7 +8,12 @@ use std::{
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ProductFamily {
+    /// XML VXSE44 only; VXSE45 carries different information.
     Forecast,
+    /// XML VXSE45, including long-period ground-motion forecasts.
+    GroundMotionForecast,
+    /// Code forecasts do not identify an XML product and remain independent.
+    TelegramForecast,
     Warning,
     RealTimeIntensity,
 }
@@ -27,7 +32,8 @@ pub enum Lifecycle {
 }
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct EventState {
-    /// Highest accepted ordinary report serial; cancellation never lowers it.
+    /// Latest accepted report serial; a correction may replace it, whereas a
+    /// cancellation keeps it unchanged and uses `cancellation_serial` instead.
     pub latest_serial: Option<u32>,
     /// Whether an accepted report carried a final marker. Cancellation is separate.
     pub is_final: bool,
@@ -67,11 +73,17 @@ impl EventTracker {
         let product = match message.product() {
             Product::Warning => ProductFamily::Warning,
             Product::RealTimeIntensity => ProductFamily::RealTimeIntensity,
-            p if p.is_forecast() => ProductFamily::Forecast,
+            Product::Forecast => ProductFamily::Forecast,
+            Product::GroundMotionForecast => ProductFamily::GroundMotionForecast,
+            Product::TelegramForecast => ProductFamily::TelegramForecast,
             _ => return None,
         };
+        let event_id = message.event_id()?;
+        if event_id.len() != 14 || !event_id.bytes().all(|b| b.is_ascii_digit()) {
+            return None;
+        }
         Some(EventKey {
-            event_id: message.event_id()?.to_owned(),
+            event_id: event_id.to_owned(),
             product,
             status: message.header.status.clone()?,
         })
@@ -115,6 +127,10 @@ impl EventTracker {
         }
         let correction = message.header.info_type == Some(InfoType::Correction);
         let reinstate = state.is_cancelled
+            && matches!(
+                message.product(),
+                Product::TelegramForecast | Product::RealTimeIntensity
+            )
             && message
                 .source
                 .as_ref()
@@ -134,7 +150,11 @@ impl EventTracker {
             return EventDecision::OlderThanLatest;
         }
         if let (Some(serial), Some(latest)) = (message.serial(), state.latest_serial) {
-            if serial < latest && !reinstate {
+            // Corrections replace the latest publication according to its
+            // Control/DateTime. Serial is not an ordering key for revisions.
+            let newer_correction = correction
+                && matches!((time, state.latest_message_time), (Some(a), Some(b)) if a > b);
+            if serial < latest && !newer_correction && !reinstate {
                 return EventDecision::OlderThanLatest;
             }
             if serial == latest && !correction && (!message.is_last_info() || state.is_final) {
@@ -142,7 +162,7 @@ impl EventTracker {
             }
         }
         if let Some(serial) = message.serial() {
-            state.latest_serial = Some(state.latest_serial.map_or(serial, |n| n.max(serial)));
+            state.latest_serial = Some(serial);
         }
         if reinstate {
             state.is_cancelled = false;
@@ -163,8 +183,8 @@ impl EventTracker {
             EventDecision::Accepted
         }
     }
-    /// Explicit product/status lookup. Forecast covers VXSE44/45 and legacy
-    /// Telegram forecasts; warning and real-time intensity are independent.
+    /// Explicit product/status lookup. VXSE44, VXSE45 and code forecasts have
+    /// separate states: a code forecast does not identify either XML product.
     pub fn state(&self, key: &EventKey) -> Option<&EventState> {
         self.events.get(key)
     }
@@ -187,14 +207,8 @@ fn older(a: Option<DateTime<FixedOffset>>, b: Option<DateTime<FixedOffset>>) -> 
 }
 fn fingerprint(m: &EewInformation) -> u64 {
     let mut h = std::collections::hash_map::DefaultHasher::new();
-    m.header.serial_no.hash(&mut h);
-    m.header.info_type.hash(&mut h);
-    m.header.report_date_time.hash(&mut h);
-    m.header.press_date_time.hash(&mut h);
-    m.body.is_last_info.hash(&mut h);
-    m.body.is_canceled.hash(&mut h);
-    if let Some(s) = &m.source {
-        s.raw.hash(&mut h);
-    }
+    // Reference JSON can legitimately omit Source and a report serial. Its
+    // payload still distinguishes reports and same-second corrections.
+    m.hash(&mut h);
     h.finish()
 }

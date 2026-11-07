@@ -267,7 +267,13 @@ fn compare_projection(x: &EewInformation, t: &EewInformation) {
                 .format("%H%M%S")
                 .to_string()
         });
-        assert_eq!(time, b.arrival_time_of_day);
+        if a.is_plum == Some(true) {
+            assert_eq!(time, b.plum_prediction_time_of_day);
+            assert!(b.arrival_time_of_day.is_none());
+        } else {
+            assert_eq!(time, b.arrival_time_of_day);
+            assert!(b.plum_prediction_time_of_day.is_none());
+        }
     }
 }
 fn roundtrip(raw: &[u8]) -> (String, EewInformation) {
@@ -409,7 +415,16 @@ fn rk_unknown_and_every_defined_rank_keep_field_specific_meanings() {
             } else {
                 format!("{}\"{value}\"", old.split('"').next().unwrap())
             };
-            let raw = change(NOTO, old, &new);
+            let mut raw = change(NOTO, old, &new);
+            if slot == 0 && matches!(value, 1 | 2) {
+                // Pattern 2 cannot preserve the original finite maximum bound.
+                unsupported(&raw, "ForecastInt");
+                raw = raw.replacen(
+                    "<From>5+</From><To>5+</To>",
+                    "<From>5+</From><To>over</To>",
+                    1,
+                );
+            }
             let (_, m) = roundtrip(raw.as_bytes());
             assert_eq!(
                 codes(&m).rk.as_ref().unwrap().as_bytes()[slot],
@@ -536,7 +551,11 @@ fn zero_unknown_nan_and_unrepresentable_ebi_bounds_are_distinguished() {
     for coord in ["+35.0+142.3/", "+35.0+142.3+0/", "+35.0+142.3-700000/"] {
         roundtrip(change(&depth_base, "+35.0+142.3-70000/", coord).as_bytes());
     }
-    for mag in ["NaN", "", "0.0", "9.9"] {
+    // Magnitude is xs:float (not nullablefloat): empty content is invalid.
+    let empty_magnitude = change(&base, ">6.1</jmx_eb:Magnitude>", "></jmx_eb:Magnitude>");
+    assert!(parse_xml(empty_magnitude.as_bytes()).is_err());
+    assert!(encode_xml_as_telegram(empty_magnitude.as_bytes()).is_err());
+    for mag in ["NaN", "0.0", "9.9"] {
         roundtrip(
             change(
                 &base,

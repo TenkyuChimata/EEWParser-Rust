@@ -1,5 +1,7 @@
-// Generated from JMA jmaxml_20261007_Code.zip, 地震火山関連コード表.xlsx.
+// Based on JMA jmaxml_20261104_Code.zip, 地震火山関連コード表.xlsx.
 // Code/name enrichment only. XML-provided names are always authoritative.
+// Explicitly marked retired station aliases are retained for historical data;
+// a name lookup does not imply the station is currently used by PLUM.
 pub(crate) fn zone(code: &str) -> Option<&'static str> {
     match code {
         "9910" => Some("北海道"),
@@ -770,7 +772,7 @@ pub(crate) fn station(code: &str) -> Option<&'static str> {
         "3520302" => Some("山口市前町"),
         "3520401" => Some("萩市土原"),
         "3520402" => Some("萩見島"),
-        "3520601" => Some("防府市寿"),
+        "3520601" => Some("防府市寿町"),
         "3520701" => Some("下松"),
         "3520803" => Some("岩国市今津"),
         "3534302" => Some("田布施町下田布"),
@@ -861,6 +863,7 @@ pub(crate) fn station(code: &str) -> Option<&'static str> {
         "4420402" => Some("日田市三本松"),
         "4420501" => Some("佐伯市蒲江蒲江"),
         "4420502" => Some("佐伯市堅田"),
+        // Retired from table 25 in 2026-10-19; name from the 2026-10-07 table.
         "4420503" => Some("佐伯蒲江"),
         "4420600" => Some("臼杵"),
         "4421200" => Some("豊後大野市三重"),

@@ -1,3 +1,6 @@
+use std::collections::HashSet;
+
+use chrono::{NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Serialize};
 
 use crate::error::AppError;
@@ -129,18 +132,7 @@ impl Telegram {
     /// Converts the official 01..99/A0..Z9 serial representation without
     /// interpreting localized display strings or inventing a fallback value.
     pub fn serial(&self) -> Option<u32> {
-        let token = self.serial_token()?;
-        if token.len() != 2 || !token.is_ascii() {
-            return None;
-        }
-        if token.bytes().all(|byte| byte.is_ascii_digit()) {
-            return token.parse().ok();
-        }
-        let bytes = token.as_bytes();
-        if bytes[0].is_ascii_uppercase() && bytes[1].is_ascii_digit() {
-            return Some(100 + u32::from(bytes[0] - b'A') * 10 + u32::from(bytes[1] - b'0'));
-        }
-        None
+        decode_serial(self.serial_token()?).ok().flatten()
     }
 
     pub fn is_final(&self) -> bool {
@@ -174,6 +166,7 @@ pub fn reader(s: &str) -> Result<Telegram, AppError> {
         return Err(invalid(format!("unsupported code type {:?}", msg.CodeType)));
     }
     msg.Section = fixed(take(&tokens, &mut index, "section")?, 2, "section")?.to_string();
+    validate_digits(&msg.Section, "section")?;
     msg.MsgType = fixed(
         take(&tokens, &mut index, "message type")?,
         2,
@@ -186,6 +179,7 @@ pub fn reader(s: &str) -> Result<Telegram, AppError> {
         "warning time",
     )?
     .to_string();
+    validate_datetime(&msg.WarnTime)?;
     let command = fixed(
         take(&tokens, &mut index, "command code")?,
         3,
@@ -223,8 +217,8 @@ pub fn reader(s: &str) -> Result<Telegram, AppError> {
 
     let end = take(&tokens, &mut index, "Telegram terminator")?;
     if end == "9999" && s.trim_end().ends_with('=') {
-        // Official code-38 tests terminate the code block with 9999, then
-        // append human-readable text before the Telegram's final '='.
+        // 9999 ends the code block; the Telegram's final '=' may follow
+        // whitespace or an optional human-readable text block.
         let offset = end.as_ptr() as usize - s.as_ptr() as usize + end.len();
         let text = s[offset..]
             .trim()
@@ -250,8 +244,10 @@ fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Res
             "earthquake time",
         )?
         .to_string();
+        validate_datetime(&msg.EqTime)?;
     }
     let nd = prefixed(take(tokens, index, "ND")?, "ND", 14)?;
+    validate_digits(nd, "ND")?;
     msg.EqID = nd.to_string();
 
     let ncn = prefixed(take(tokens, index, "NCN")?, "NCN", 3)?;
@@ -262,11 +258,13 @@ fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Res
     }
     msg.WarnCode = ncn[0..1].to_string();
     msg.WarnNum = ncn[1..3].to_string();
+    decode_serial(&msg.WarnNum)?;
 
     msg.raw_codes.jd = Some(prefixed(take(tokens, index, "JD")?, "JD", 14)?.to_owned());
     msg.raw_codes.jn = Some(prefixed(take(tokens, index, "JN")?, "JN", 3)?.to_owned());
 
     msg.Shinou = fixed(take(tokens, index, "epicenter code")?, 3, "epicenter code")?.to_string();
+    validate_numeric_code(&msg.Shinou, "epicenter code")?;
     msg.ShinouLat = parse_coordinate(take(tokens, index, "latitude")?, 'N', 'S', 3)?;
     msg.ShinouLng = parse_coordinate(take(tokens, index, "longitude")?, 'E', 'W', 4)?;
     msg.ShinouDpth = parse_unknown_i64(take(tokens, index, "depth")?, 3, "depth")?;
@@ -277,6 +275,7 @@ fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Res
         "maximum intensity",
     )?
     .to_string();
+    validate_intensity(&msg.Shindo)?;
 
     let rk = prefixed(take(tokens, index, "RK")?, "RK", 5)?;
     msg.raw_codes.rk = Some(rk.to_owned());
@@ -302,14 +301,33 @@ fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Res
 
     match tokens.get(*index).copied() {
         Some("EBI") => {
+            if !matches!(msg.CodeType.as_str(), "36" | "37" | "47") {
+                return Err(invalid(
+                    "EBI is only defined for forecast patterns 2/3 and NCP",
+                ));
+            }
             *index += 1;
-            while tokens.get(*index).copied() != Some("9999=") {
-                msg.Ebis.push(parse_ebi(tokens, index)?);
+            let mut areas = HashSet::new();
+            while !is_code_end(tokens.get(*index).copied()) {
+                let ebi = parse_ebi(tokens, index)?;
+                if !areas.insert(ebi.Chiiki.clone()) {
+                    return Err(invalid("duplicate EBI area"));
+                }
+                msg.Ebis.push(ebi);
+            }
+            if msg.Ebis.is_empty() {
+                return Err(invalid("empty EBI block must be omitted"));
             }
         }
         Some("EIP") => {
+            if msg.CodeType != "61" {
+                return Err(invalid(
+                    "EIP is only defined for real-time intensity Telegrams",
+                ));
+            }
             *index += 1;
-            while tokens.get(*index).copied() != Some("9999=") {
+            let mut stations = HashSet::new();
+            while !is_code_end(tokens.get(*index).copied()) {
                 let code = take(tokens, index, "EIP station code")?;
                 if !(7..=8).contains(&code.len())
                     || !code.bytes().all(|b| b.is_ascii_alphanumeric())
@@ -318,8 +336,14 @@ fn parse_forecast(tokens: &[&str], index: &mut usize, msg: &mut Telegram) -> Res
                         "EIP station code must be 7 ASCII alphanumeric bytes (8 in the official legacy example)",
                     ));
                 }
+                if !stations.insert(code) {
+                    return Err(invalid("duplicate EIP station"));
+                }
                 let value = prefixed(take(tokens, index, "EIP intensity")?, "P", 2)?;
                 msg.eip.push((code.to_owned(), value.to_owned()));
+            }
+            if msg.eip.is_empty() {
+                return Err(invalid("empty EIP block must be omitted"));
             }
         }
         _ => {}
@@ -340,8 +364,13 @@ fn parse_warning(
         "earthquake time",
     )?
     .to_string();
+    validate_datetime(&msg.EqTime)?;
     msg.EqID = prefixed(take(tokens, index, "ND")?, "ND", 14)?.to_string();
+    validate_digits(&msg.EqID, "ND")?;
     let ncpn = prefixed(take(tokens, index, "NCPN")?, "NCPN", 2)?;
+    if decode_serial(ncpn)?.is_none() {
+        return Err(invalid("NCPN requires a warning serial"));
+    }
     let warning_number = ncpn.to_string();
     msg.raw_codes.ncpn = Some(ncpn.to_owned());
     msg.WarnType = "NCPN".to_string();
@@ -355,10 +384,15 @@ fn parse_warning(
         )?
         .to_owned(),
     );
+    validate_numeric_code(
+        msg.reduced_epicenter.as_deref().unwrap(),
+        "reduced epicenter code",
+    )?;
     msg.ShinouLat = parse_coordinate(take(tokens, index, "latitude")?, 'N', 'S', 3)?;
     msg.ShinouLng = parse_coordinate(take(tokens, index, "longitude")?, 'E', 'W', 4)?;
     msg.ShinouDpth = parse_unknown_i64(take(tokens, index, "depth")?, 3, "depth")?;
     msg.raw_codes.prc = Some(prefixed(take(tokens, index, "PRC")?, "PRC", 5)?.to_owned());
+    validate_digits_or_slashes(msg.raw_codes.prc.as_deref().unwrap(), "PRC")?;
 
     for (marker, next) in [
         ("CAI", "CPI"),
@@ -417,7 +451,9 @@ fn consume_list(
         return Err(invalid(format!("expected {marker}")));
     }
     let start = *index;
-    while tokens.get(*index).copied() != Some(next) {
+    while tokens.get(*index).copied() != Some(next)
+        && !(next == "9999=" && is_code_end(tokens.get(*index).copied()))
+    {
         if *index >= tokens.len() {
             return Err(invalid(format!("unterminated {marker} list")));
         }
@@ -435,7 +471,7 @@ fn consume_list(
         .iter()
         .map(|t| {
             fixed(t, width, marker)?;
-            validate_digits_or_slashes(t, marker)?;
+            validate_numeric_code(t, marker)?;
             Ok((*t).to_owned())
         })
         .collect()
@@ -443,12 +479,20 @@ fn consume_list(
 
 fn parse_ebi(tokens: &[&str], index: &mut usize) -> Result<Ebi, AppError> {
     let area = fixed(take(tokens, index, "EBI area")?, 3, "EBI area")?;
+    validate_numeric_code(area, "EBI area")?;
     let intensity = fixed(take(tokens, index, "EBI intensity")?, 5, "EBI intensity")?;
     let intensity = intensity
         .strip_prefix('S')
         .ok_or_else(|| invalid("EBI intensity must start with S"))?;
     let time = fixed(take(tokens, index, "EBI time")?, 6, "EBI time")?;
     let flags = fixed(take(tokens, index, "EBI flags")?, 2, "EBI flags")?;
+    validate_intensity(&intensity[0..2])?;
+    validate_intensity(&intensity[2..4])?;
+    validate_digits_or_slashes(flags, "EBI flags")?;
+    if time != "//////" {
+        validate_digits(time, "EBI time")?;
+        NaiveTime::parse_from_str(time, "%H%M%S").map_err(|_| invalid("EBI invalid HHMMSS"))?;
+    }
     Ok(Ebi {
         Chiiki: area.to_string(),
         Shindo1: intensity[0..2].to_string(),
@@ -502,6 +546,7 @@ fn parse_coordinate(
         value if value == negative => -1.0,
         _ => return Err(invalid("invalid coordinate hemisphere")),
     };
+    validate_digits(&token[1..], "coordinate")?;
     let value = token[1..]
         .parse::<u32>()
         .map_err(|_| invalid("invalid coordinate digits"))?;
@@ -529,10 +574,71 @@ fn parse_unknown_decimal(token: &str, length: usize, field: &str) -> Result<Opti
     if token.chars().all(|c| c == '/') {
         return Ok(None);
     }
+    validate_digits(token, field)?;
     token
         .parse::<u32>()
         .map(|value| Some(f64::from(value) / 10.0))
         .map_err(|_| invalid(format!("invalid {field}")))
+}
+
+fn is_code_end(token: Option<&str>) -> bool {
+    matches!(token, Some("9999" | "9999="))
+}
+
+fn validate_digits(token: &str, field: &str) -> Result<(), AppError> {
+    if token.bytes().all(|b| b.is_ascii_digit()) {
+        Ok(())
+    } else {
+        Err(invalid(format!("{field} requires ASCII digits")))
+    }
+}
+
+fn validate_numeric_code(token: &str, field: &str) -> Result<(), AppError> {
+    if token.bytes().all(|b| b == b'/') {
+        Ok(())
+    } else {
+        validate_digits(token, field)
+    }
+}
+
+fn validate_datetime(token: &str) -> Result<(), AppError> {
+    validate_digits(token, "YYMMDDHHMMSS")?;
+    NaiveDateTime::parse_from_str(&format!("20{token}"), "%Y%m%d%H%M%S")
+        .map(|_| ())
+        .map_err(|_| invalid("invalid YYMMDDHHMMSS"))
+}
+
+fn validate_intensity(token: &str) -> Result<(), AppError> {
+    // 05/06 occur in historical official examples and are retained without
+    // inventing a strong/weak subdivision.
+    if matches!(
+        token,
+        "//" | "01" | "02" | "03" | "04" | "05" | "06" | "07" | "5-" | "5+" | "6-" | "6+"
+    ) {
+        Ok(())
+    } else {
+        Err(invalid(format!("undefined Telegram intensity {token:?}")))
+    }
+}
+
+/// Official NCN and NCPN serial encoding. Unset is not zero.
+pub fn decode_serial(raw: &str) -> Result<Option<u32>, AppError> {
+    if raw.is_empty() || raw == "//" {
+        return Ok(None);
+    }
+    let b = raw.as_bytes();
+    if b.len() != 2 || !b[1].is_ascii_digit() {
+        return Err(invalid("invalid NCN/NCPN serial"));
+    }
+    let number = match b[0] {
+        b'0'..=b'9' => u32::from(b[0] - b'0') * 10 + u32::from(b[1] - b'0'),
+        b'A'..=b'Z' => 100 + u32::from(b[0] - b'A') * 10 + u32::from(b[1] - b'0'),
+        _ => return Err(invalid("invalid serial")),
+    };
+    if number == 0 {
+        return Err(invalid("serial 00 is not an information number"));
+    }
+    Ok(Some(number))
 }
 
 fn validate_digits_or_slashes(token: &str, field: &str) -> Result<(), AppError> {
@@ -595,6 +701,8 @@ fn shindo(code: &str) -> &'static str {
         "02" => "2",
         "03" => "3",
         "04" => "4",
+        "05" => "5",
+        "06" => "6",
         "5-" => "5弱",
         "5+" => "5強",
         "6-" => "6弱",

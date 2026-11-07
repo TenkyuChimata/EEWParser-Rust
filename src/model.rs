@@ -94,7 +94,7 @@ impl LgIntensityValue {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EewInformation {
     #[serde(flatten)]
@@ -156,7 +156,7 @@ impl EewInformation {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Header {
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
@@ -191,7 +191,7 @@ pub struct Header {
     pub valid_date_time: Option<String>,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Body {
     pub is_last_info: bool,
@@ -215,14 +215,14 @@ pub struct Body {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub next_advisory: Option<String>,
 }
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CodeName {
     pub code: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WarningKind {
     #[serde(flatten)]
@@ -230,13 +230,13 @@ pub struct WarningKind {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_kind: Option<CodeName>,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct WarningArea {
     #[serde(flatten)]
     pub area: CodeName,
     pub kind: WarningKind,
 }
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Earthquake {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -249,7 +249,7 @@ pub struct Earthquake {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub magnitude: Option<Quantity>,
 }
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Hypocenter {
     #[serde(flatten)]
@@ -264,7 +264,7 @@ pub struct Hypocenter {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accuracy: Option<Accuracy>,
 }
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Coordinate {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -278,17 +278,17 @@ pub struct Coordinate {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub condition: Option<String>,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct CoordinateAxis {
     pub text: String,
     pub value: String,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum QuantityBound {
     #[serde(rename = "lower")]
     Lower,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Quantity {
     #[serde(rename = "type")]
     pub kind: String,
@@ -306,7 +306,7 @@ impl Quantity {
         self.value.as_deref()?.parse().ok()
     }
 }
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Accuracy {
     pub epicenters: [Option<String>; 2],
@@ -314,12 +314,12 @@ pub struct Accuracy {
     pub magnitude_calculation: Option<String>,
     pub number_of_magnitude_calculation: Option<String>,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct ForecastRange<T> {
     pub from: T,
     pub to: T,
 }
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Intensity {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -333,7 +333,7 @@ pub struct Intensity {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stations: Option<Vec<Station>>,
 }
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Appendix {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -343,7 +343,7 @@ pub struct Appendix {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_int_change_reason: Option<String>,
 }
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ForecastRegion {
     #[serde(flatten)]
@@ -359,37 +359,43 @@ pub struct ForecastRegion {
     pub kind: CodeName,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub condition: Option<String>,
+    /// XML ArrivalTime. With `is_plum == Some(true)`, this is when PLUM
+    /// first predicted this intensity; otherwise it is the predicted arrival.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub arrival_time: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub arrival_time_of_day: Option<String>,
+    /// Code Telegram EBI HHMMSS when y2=9: the time PLUM first predicted
+    /// this intensity, not a predicted wave arrival. No date is inferred.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub plum_prediction_time_of_day: Option<String>,
 }
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Station {
     #[serde(flatten)]
     pub station: CodeName,
     pub int: IntensityValue,
     pub k: Option<String>,
 }
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Comments {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub free: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warning: Option<WarningComment>,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct WarningComment {
     pub text: String,
     pub codes: Vec<String>,
 }
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SourceFormat {
     Xml,
     Telegram,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Source {
     pub format: SourceFormat,
@@ -404,14 +410,14 @@ pub struct Source {
 }
 /// The old 2013 manual defines NCN correction states 6/7/8. The current
 /// manual defines only 0/9/unset; no exact retirement date is assumed.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum NcnConvention {
     #[default]
     Current,
     Legacy2013,
 }
 /// Fields with no XML equivalent stay here, including unset '/' values.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TelegramCodes {
     #[serde(default)]

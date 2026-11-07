@@ -1,8 +1,10 @@
 //! Code Telegram -> semantic information, without a second parse or localized
 //! display-string interpretation.
-use crate::xml::{axis, depth_quantity, format_number, kind_flags};
+use crate::xml::{axis, depth_quantity, format_number};
 use crate::{EewError, codes, model::*, parser};
 use chrono::{FixedOffset, NaiveDateTime, NaiveTime};
+
+pub use crate::parser::decode_serial;
 
 pub fn parse(raw: &str) -> Result<EewInformation, EewError> {
     parse_with_convention(raw, NcnConvention::Current)
@@ -52,7 +54,7 @@ pub fn parse_with_convention(
         },
         info_type: Some(if canceled {
             InfoType::Cancellation
-        } else if legacy_correction {
+        } else if legacy_correction && product != Product::Warning {
             InfoType::Correction
         } else {
             InfoType::Publication
@@ -65,13 +67,20 @@ pub fn parse_with_convention(
         return Err(invalid("ND requires 14 digits"));
     }
     header.serial_no = decode_serial(&msg.WarnNum)?.map(|n| n.to_string());
-    if convention == NcnConvention::Legacy2013
-        && header
-            .serial_no
-            .as_ref()
-            .is_some_and(|n| n.parse::<u32>().is_ok_and(|n| n > 99))
-    {
-        return Err(invalid("2013 NCN convention supports serials 01..99 only"));
+    if convention == NcnConvention::Legacy2013 {
+        // In a warning the nested NCN belongs to the forecast, independently
+        // of the outer NCPN. Both serials must obey the selected convention.
+        for raw in [
+            msg.raw_codes.ncn.as_deref().map(|n| &n[1..]),
+            msg.raw_codes.ncpn.as_deref(),
+        ]
+        .into_iter()
+        .flatten()
+        {
+            if decode_serial(raw)?.is_some_and(|n| n > 99) {
+                return Err(invalid("2013 NCN convention supports serials 01..99 only"));
+            }
+        }
     }
     if !msg.EqTime.is_empty() {
         timestamp(&msg.EqTime)?;
@@ -213,7 +222,19 @@ pub fn parse_with_convention(
             let mut regions = Vec::with_capacity(msg.Ebis.len());
             for e in &msg.Ebis {
                 let kind_code = format!("{}{}", e.Type, e.Arrive);
-                let (is_warning, is_plum) = kind_flags(&kind_code);
+                // Unlike the XML Kind code, the Telegram's y1 and y2 are
+                // independently defined flags. An unset one must not erase
+                // the information supplied by the other.
+                let is_warning = match e.Type.as_str() {
+                    "0" => Some(false),
+                    "1" => Some(true),
+                    _ => None,
+                };
+                let is_plum = match e.Arrive.as_str() {
+                    "0" | "1" => Some(false),
+                    "9" => Some(true),
+                    _ => None,
+                };
                 let upper = intensity_value(&e.Shindo1)?;
                 let (from, to) = if e.Shindo2 == "//" {
                     (upper, IntensityValue::Over)
@@ -245,7 +266,9 @@ pub fn parse_with_convention(
                     forecast_max_lg_int: None,
                     condition: (e.Arrive == "1").then(|| "既に主要動到達と推測".into()),
                     arrival_time: None,
-                    arrival_time_of_day: (e.Arrive != "1" && e.Time != "//////")
+                    arrival_time_of_day: (e.Arrive == "0" && e.Time != "//////")
+                        .then(|| e.Time.clone()),
+                    plum_prediction_time_of_day: (e.Arrive == "9" && e.Time != "//////")
                         .then(|| e.Time.clone()),
                 });
             }
@@ -291,7 +314,7 @@ pub fn parse_with_convention(
             raw: raw.to_owned(),
             final_report,
             sent_at: Some(sent_at),
-            code_table_version: Some("2026-10-07".into()),
+            code_table_version: Some("2026-11-04".into()),
             telegram: Some(msg.raw_codes),
         }),
     })
@@ -337,25 +360,6 @@ fn warning_areas(
         })
         .collect();
     (!list.is_empty()).then_some(list)
-}
-/// Official NCN and NCPN serial encoding. Unset is not zero.
-pub fn decode_serial(raw: &str) -> Result<Option<u32>, EewError> {
-    if raw.is_empty() || raw == "//" {
-        return Ok(None);
-    }
-    let b = raw.as_bytes();
-    if b.len() != 2 || !b[1].is_ascii_digit() {
-        return Err(invalid("invalid NCN/NCPN serial"));
-    }
-    let number = match b[0] {
-        b'0'..=b'9' => u32::from(b[0] - b'0') * 10 + u32::from(b[1] - b'0'),
-        b'A'..=b'Z' => 100 + u32::from(b[0] - b'A') * 10 + u32::from(b[1] - b'0'),
-        _ => return Err(invalid("invalid serial")),
-    };
-    if number == 0 {
-        return Err(invalid("serial 00 is not an information number"));
-    }
-    Ok(Some(number))
 }
 fn timestamp(raw: &str) -> Result<String, EewError> {
     let full = format!("20{raw}");

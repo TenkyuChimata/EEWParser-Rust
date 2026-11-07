@@ -54,7 +54,9 @@ pub fn read_stdin(requested: InputFormat) -> Result<RawInput, AppError> {
     read_stream(io::stdin().lock(), requested)
 }
 
-/// Reads XML through EOF. Telegram streams may finish as soon as their first `=` is read.
+/// Reads XML through EOF. Telegram streams finish at their first `=`.
+/// Up to one read-buffer of bytes after `=` can be consumed from `reader` and
+/// discarded; this function reads a single message, not a reusable framed stream.
 pub fn read_stream<R: Read>(mut reader: R, requested: InputFormat) -> Result<RawInput, AppError> {
     let mut bytes = Vec::new();
     let mut chunk = [0_u8; 8192];
@@ -62,14 +64,12 @@ pub fn read_stream<R: Read>(mut reader: R, requested: InputFormat) -> Result<Raw
     let mut detection_position = 0;
 
     loop {
-        let count = reader.read(&mut chunk)?;
+        let count = match reader.read(&mut chunk) {
+            Err(error) if error.kind() == io::ErrorKind::Interrupted => continue,
+            result => result?,
+        };
         if count == 0 {
             break;
-        }
-        if bytes.len() + count > MAX_INPUT_BYTES {
-            return Err(AppError::InputTooLarge {
-                limit: MAX_INPUT_BYTES,
-            });
         }
         let previous_length = bytes.len();
         bytes.extend_from_slice(&chunk[..count]);
@@ -82,12 +82,24 @@ pub fn read_stream<R: Read>(mut reader: R, requested: InputFormat) -> Result<Raw
             InputFormat::Auto => detected,
             explicit => Some(explicit),
         };
-        if effective == Some(InputFormat::Telegram)
-            && let Some(end) = bytes[previous_length..]
-                .iter()
-                .position(|byte| *byte == b'=')
-        {
+        let end = (effective == Some(InputFormat::Telegram))
+            .then(|| {
+                bytes[previous_length..]
+                    .iter()
+                    .position(|byte| *byte == b'=')
+            })
+            .flatten();
+        if let Some(end) = end {
             bytes.truncate(previous_length + end + 1);
+        }
+        // Trailing bytes read in the same chunk are outside the logical
+        // Telegram and must not make acceptance depend on read chunk sizes.
+        if bytes.len() > MAX_INPUT_BYTES {
+            return Err(AppError::InputTooLarge {
+                limit: MAX_INPUT_BYTES,
+            });
+        }
+        if end.is_some() {
             break;
         }
     }
@@ -173,12 +185,28 @@ pub fn telegram_for_json(content: &str) -> String {
         .join(" ")
 }
 
-// roxmltree 0.20 recursively parses element content. Bound nesting before
-// constructing either XML DOM; the byte/node limits do not bound stack usage.
+// Bound document complexity before constructing either XML DOM. The depth
+// limit also keeps a stable resource contract across parser implementations.
 // This is only a lexical resource guard. roxmltree still validates XML syntax.
 pub(crate) fn check_xml_depth(mut xml: &str) -> Result<(), AppError> {
     const MAX_DEPTH: usize = 128;
+    const MAX_ALLOCATION_MARKERS: usize = 250_000;
+    const MAX_ATTRIBUTES_PER_TAG: usize = 256;
     let invalid = |message: &str| AppError::InvalidXml(message.to_owned());
+    // roxmltree reserves node/attribute storage from every '<' and '=' byte,
+    // including those inside plain text, comments and CDATA, before checking
+    // nodes_limit. Bound that allocation estimate as well as actual DOM nodes.
+    if xml
+        .bytes()
+        .filter(|b| matches!(b, b'<' | b'='))
+        .take(MAX_ALLOCATION_MARKERS + 1)
+        .count()
+        > MAX_ALLOCATION_MARKERS
+    {
+        return Err(invalid(
+            "XML allocation markers exceed the 250000-marker limit",
+        ));
+    }
     let mut depth = 0_usize;
     'markup: while let Some(start) = xml.find('<') {
         xml = &xml[start..];
@@ -197,11 +225,20 @@ pub(crate) fn check_xml_depth(mut xml: &str) -> Result<(), AppError> {
         let closing = xml.starts_with("</");
         let mut quote = None;
         let mut end = None;
+        let mut attributes = 0_usize;
         for (index, byte) in xml.bytes().enumerate().skip(1) {
             match (quote, byte) {
                 (Some(q), b) if q == b => quote = None,
                 (Some(_), _) => {}
                 (None, b'\'' | b'"') => quote = Some(byte),
+                (None, b'=') => {
+                    // Attribute duplicate/namespace resolution in the DOM
+                    // parser scans earlier attributes within this tag.
+                    attributes += 1;
+                    if attributes > MAX_ATTRIBUTES_PER_TAG {
+                        return Err(invalid("XML tag exceeds the 256-attribute limit"));
+                    }
+                }
                 (None, b'>') => {
                     end = Some(index);
                     break;

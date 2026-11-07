@@ -477,7 +477,10 @@ fn maximum_intensity_code(
     // pattern 3 interprets it as a point. Never silently discard a finite
     // upper bound, or turn a half-unknown range into a known value.
     let lower_bound = code_type == "36" || assumed;
-    if (range.from != range.to && range.to != "over") || (range.to == "over" && !lower_bound) {
+    if (lower_bound && !matches!(range.from.as_str(), "0" | "不明") && range.to != "over")
+        || (range.from != range.to && range.to != "over")
+        || (range.to == "over" && !lower_bound)
+    {
         return Err(unavailable(
             "Forecast/ForecastInt",
             "the maximum intensity range cannot be represented by this Telegram pattern's scalar ss field",
@@ -502,12 +505,20 @@ fn coordinate_codes(latitude: f64, longitude: f64) -> Result<(String, String), A
     Ok((
         format!(
             "{}{:03}",
-            if latitude_tenths < 0 { 'S' } else { 'N' },
+            if latitude.is_sign_negative() {
+                'S'
+            } else {
+                'N'
+            },
             latitude_tenths.unsigned_abs()
         ),
         format!(
             "{}{:04}",
-            if longitude_tenths < 0 { 'W' } else { 'E' },
+            if longitude.is_sign_negative() {
+                'W'
+            } else {
+                'E'
+            },
             longitude_tenths.unsigned_abs()
         ),
     ))
